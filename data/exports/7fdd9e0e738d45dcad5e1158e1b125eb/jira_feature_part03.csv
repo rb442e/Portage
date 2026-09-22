@@ -1,0 +1,917 @@
+﻿Issue Id,Parent Id,Issue Type,Summary,Description,Status,Priority,Labels,Components,Sprint,Story Points,Assignee,Reporter,Fix Version/s,Team,Start Date,Due Date,Issue Links,Rally ID
+FEATURE-F223469,16479962,Feature,Cap on Digital Activities & Gamification enablement of an INCV Program.,"Mothi, Shikha, Eric, Veda, Sasi, Sridevi, Victoria, Jay, Priya, Eric, Laxman, Cyndi, Azhar, Phalguni, ShanthiTech Lead = MothiBusiness Lead = LeahLoB: Both AHM and Aetna ELITE ClientsPlatform: <Web, iOS, Android>
+
+Business Value:
+Retention of impacted clients, tying back to increase RevenueExpand our client base, tying back to increase in RevenueScope:Client would like to provide Cap on Digital Activities (Explore, Pathway, Health Actions) and reflect the same for its population on MAH.Cap on Digital Activities can be applicable for either Hearts or Points or Dollar or Custom based INCV Program.Disable Hearts for Reporting ONLY Incentive Package: Clients would like to turn OFF Hearts if Reporting ONLY Incentive package.Disable Hearts for Completion ONLY configuration: Clients with a Completion ONLY configuration and ONLY one goal should be able to disable Hearts.Ask:Client would like to provide Cap on Digital Activities (Explore, Pathway, Health Actions) and reflect the same for its population on MAH.COP:Client would like to provide Cap (Max value that can be earned) on Digital Activities (Explore, Pathway, Health Actions) and reflect the same for its population on MAH.Capability for an IMP team to input the client's Cap (Max) on Digital bundle activities (Explore, Pathway, Health Actions). Ex: Cap at 20$ or 30$If client setup Cap (Max) for Yellow Bundle Activities: Member cannot earn more than the cap (Max) for completing the bundled Digital Activities (Explore, Pathway, Health Actions).Cap setting on Digital Activities is applied to all Hearts or Points or Dollar or Custom INCV program.Cap Value is NOT mandatory.Client can setup Cap irrespective of Gamification ON or OFFSpreadsheet (which is used by BW to configure) modifications based on these new changes Downstream:INCV/MAH:INCV MAX CAP limit reached to be verified(Explore, Pathway, Health Actions). MAHIf client setup Cap (Max) for Digital Activities (Explore, Pathway, Health Actions) : Member cannot earn more than the cap (Max) for completing the bundle Digital Activities (Explore, Health Actions, Pathway) on MAH platform. Reward Limit level reached on MAH UI. TMV (UI):???R & A:?? Disable Hearts for Reporting ONLY Incentive Package: Clients would like to turn OFF Hearts (Gamification OFF) if Reporting ONLY Incentive package and client's population to view NO Hearts on MAH platform.Disable Hearts for Completion ONLY configuration: Clients with a Completion ONLY configuration and ONLY one goal should be able to disable/turn OFF Hearts (Gamification OFF) and client's population to view NO Hearts on MAH platform COP-INCV flags INCV ProductGamificationReporting OnlyHealth ChecklistHeart IconYesYesYesSuppressShowYesNoYesSuppressHideYesYesNo ShowYesNoNo ShowCOP:At preset: IMP team can NOT turn OFF Hearts (Gamification OFF), as needed.For either Reporting ONLY INCV program or for an INCV Completion ONLY configuration with ONLY one goalneed to check with INCV on why COP cannot turn OFF.Test data SupportDownstream:INCV/MAH:INCV to consume Gamification ON/OFF from COP and communicate to downstream (MAH UI) as needed.MAH to consume and use Gamification ON/OFF accordingly.Digital UI should rollback all other logic and drive logic based on this flag for onboarding, rewards drawer, MH100, Health ChecklistCelebration screen - hearts for gamification on , high five for gamification offIf supplier configures gamification on without any redemption type , I (belonging to client population) should see heart count on rewards header and I should not be able those redeem hearts or open the reward drawerIf supplier configures gamification on for me with any other redemption type , I (belonging to client population) should be able to see gamification with redemption type for and the rewards drawer should open for me to track my redemption types progress only (cannot track gamification)If supplier configures gamification off for me with any other redemption type , I (belonging to client population) should be able to see only redemption type for the gamification on redemption type and the rewards drawer should open for me to track my redemption typesIf supplier configures gamification on for me with reporting turned on , I (belonging to client population) should see gamification like experience on UI - heart count on rewards header and I should not be able those redeem hearts or open the reward drawerIf supplier configures gamification off for me with reporting turned on , I (belonging to client population) should have UI experience of having no reward program - nothing related to rewards on the app UIPlease find
+
+use cases:
+Reporting only and gamification.xlsxTMV:No change in TMVBAU (Business as usual)E2ER & A:setup reporting only INCV package, and when reporting is setup, none of the activities related to gamification should reflect in this report.
+
+Success Criteria:
+Clients would be able to setup Cap (Max that its population can earn) on Digital Activities (Pathway, Explore, Health Actions)Once Cap is being setup by client, clients population cannot earn more than the Cap for Digital Activities on MAHClient members to view NO Hearts on the MAH platform if client has setup a Reporting ONLY INCV Program with Hearts turn OFF (Gamification OFF)Client members to view NO Hearts on the MAH platform if client has setup an INCV Program with Hearts turn OFF (Gamification OFF) and if INCV program is a Completion ONLY program (with ONLY one Goal/Reward).
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Assumptions:
+Completion based programs continue as existing.INCV Program/Request is applied to INCV program level and each INCV program can have more than one goal/reward and more than one supplier.Figma screens: ----
+
+Notes:
+251st refinement : 8/13/20252nd refinement: 8/14/2025TrainTeamPOCT-shirt EstimatesPointsDPBrightonSasi/Veda 85DPFulham/EvertonMothi/Shikha 160 ptsDPArsenalSobha/Divyank 20DPWest Ham - Celebration screens + Other modules Berozee/ Ganesh 307DPNottingham - Rewards + HC Azhar/Phalguni 95+25=120CDPAudi Vivek 30CDPMercedesAnupama 30CDPChryslerRajesh 10CMRange RoverNikhil / Parthibanand 20IOThorSuma / Subodh 20R&AMercuryVictoria 10 CM Train Scope - Range Rover
+
+In Scope:
+Ensure conversion ratio and reward type other than hearts are considered and Agent Assisted Gift Card redemption Different kind of Reward type should show up in TMV, existing column will be utilized
+
+Out of Scope:
+New API IntegrationsSuccess Criteria and MetricsCorrect calculations are done for redemption and all values in TMV
+
+Integration Testing Required:
+(Y/N)YesAssumptionsNo new API integrations will be required from a TMV perspective, only modification to existing logic
+
+Dependencies:
+Incentive team to provide modified APIsIO Tra 1. Client configured incentives ex: hearts, points or Dollar or any custom values should be displayed in the emails & notifications 2. Enhance Payload contract details for existing big query view with CDP 3. Changes is identified for Incentive overview email & Redemption reminder email only 4. End to end validation of Emails with Varying Naming Conventions i.e Hearts, Points, Dollar or any custom namingOut of Scope Gift Card redemption confirmation email & Email - Reminder to complete incentivized activitySuccess Criteria and MetricsSuccessful delivery of emails with appropriate content based on incentives configuredIntegration Testing Required (Y/N)YesAssumptionsNo new API integrations will be required, only modification to existing logic CDP & DigitalEmail - Incentives overview emailY - Images change to something generic. Currently it has hearts in the imageEmail - Gift Card redemption confirmation emailNEmail - Reminder to redeem gift cardY - content + image - E2EEmail - Reminder to complete incentivized activityNHercules & Thor teams Query: what happens if there is no Incentive product today for an elite client?AT MAH: Client population will see gamification option, same as CORE (standard program ) will be applied, they can use the portal ONLY for gamification purpose and nothing cannot be redeemed. Earning hearts will NOT contribute towards any redemption.Query: what happens if there is incentive product and no custom program being setup for ELITE Client?At MAH: Hearts icon will be suppressed in the portal, MAH will act as ONLY MEP setup and NOT anything related to INCV 8/13/2025 MOM (Discussed below):Client XYZ program1 goal points2 goal points3 goal points4 goal points5 goal completion (premium deduction)client ABC program1 goal Dollar--HRA2 goal Dollar--HSA3 goal Dollar---Gift Card4 goal Dollar---Maternity Program (as a separate goal)5 goal completion (premium deduction)Below is NOT available in modern.client ABC program1 goal Points--HRA2 goal Dollar--HSA3 goal Dollar---Gift Card4 goal Dollar---Maternity Program (as a separate goal)5 goal completion (premium deduction)XYZ program for Jan to dec 2025 if reward type = PointsXYZ renewed program from Jan to DEC 2026 , if client want to change reward type, yes they can do. We will carryover that conversion (for gift card) and surface to the member.Yellow Digital activities (which are bundled ):for pathway if COP sending 5 as a valueconversion ratio is 1:1 then Pathway to be treated as 5 cents on MAH/INCV conversions.ONLY for Digital activities and for direct dollar based program = to be treated in cents.Wellness Bucks or Dollar conversion ratio as 1:11 point to 1 dollar conversion1 hearts to 1 dollar conversionIf the conversion ratio is ever seen as 1:1 ( right hand being seen as dollar), digital activites to be considered as cents. 8/14 AT COP:display all of the activities within each bundle and display the defaults, client can adjust based on their need.orprovide conversion ratio for digital and conversion ratio for the rest of activities and proceed from thereAt INCV: to have a brain storming session, on whether the conversion logic to be applied at one system and communicate that information to MAH UI, TMV....etc 8/27 MOM:MOM:Elaborated on Hearts, Points, Custom INCV program.COP to capture Conversion Ratio and communicate to downstream.Example of conversion ratio:100 (Hearts): 1 (Dollar)Left hand side is the Reward and Right hand side is the Dollar.Activity value to be captured in the respective Reward Type and communicate to INCV.Activity value to be always an whole number. Validation to be in place at COP.ONLY piece pending for elaboration b/w COP and INCV is Dollar based program.While Redemption (Reward workflow/Redemption logic) (@Vytla, Sridevi to opt for one of the approach as below)Approach 1: While outbound, INCV decorates/fabricates the redemption (currency, Conversion ratio) and send over to calling application (Ex: MAH Front end UI, TMV)Or Approach 2: Calling applications (Ex: MAH Front end UI, TMV) can fabricate by consuming Reward Type, conversion ratio)",,,MAH PLSS_Cross_Platform,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F223469
+FEATURE-F230693,16479745,Feature,Review the security vulnerability when the user calls to update the profile via TAC/L1 team,"Problem Statement (Who, What, Where, When, Why):
+We need to re-open the discussion on voice OTP (or discuss adding security measures for Modern MAH profile update capabilities through L1)In discussion with the security team the workflow below was suggested by the security team to enhance the security vulnerability:
+
+Benefit Hypothesis:
+
+Contacts/Dependencies:
+
+In Scope:
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:
+
+Outstanding Questions:",Backlog,,MAH PLSS_Cross_Platform,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F230693
+FEATURE-F230694,16479745,Feature,Allow members to keep using and retaining their healthy habits even when they have successfully completed all their Pathway,"Problem Statement (Who, What, Where, When, Why):
+We need to have a feature on allowing members to either re-take a completed pathway or a new non-recommended pathway (as of today once the member complete their recommended pathway they have NO more pathway to participate)
+
+Benefit Hypothesis:
+
+Contacts/Dependencies:
+
+In Scope:
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:
+
+Outstanding Questions:",Backlog,,MAH PLSS_Cross_Platform,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F230694
+FEATURE-F230695,16479745,Feature,Allow Promotional Comms to be turned off/on by communication campaign,"Problem Statement (Who, What, Where, When, Why):
+Today: Clients can choose to suppress MAH Promotional Communications, however it is suppresses all communications, with no ability to choose to keep some communications on while disabling other communications. Request: Clients should be able to choose to enable & disable MAH promotional communications campaigns individually (vs all or nothing)
+
+Benefit Hypothesis:
+
+Contacts/Dependencies:
+
+In Scope:
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:
+
+Outstanding Questions:",Backlog,,MAH PLSS_Cross_Platform,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F230695
+FEATURE-F230696,16479745,Feature,Pending Activities: fails to move to complete after a specified time,"Problem Statement (Who, What, Where, When, Why):
+As a member, when an activity moves to Pending bc I indicate I've done it, there is no prompting in the system that this item never moved to complete. This is particularly relevant when a claim or completion file is required to satisfy the activity. How can we design a better experience and take the burden off of the member to remember to go back & check that the claim (or completion file) came in and their Reward Activity moved to complete?
+
+Benefit Hypothesis:
+
+Contacts/Dependencies:
+
+In Scope:
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:
+
+Outstanding Questions:",Backlog,,MAH PLSS_Cross_Platform,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F230696
+FEATURE-F230697,16479745,Feature,Ability to fulfill a request by member for hard copies mailed,"Problem Statement (Who, What, Where, When, Why):
+Due to reasonable accommodation expectations, we must have the ability to respond to a member's request for physical copies of MAH digital content mailed to the member.This could include, but is not limited to:-Privacy Policy-Terms of Use-their My Health Record-their Health Assessment answers-Documents housed in """"Communications"""" (under profile)
+
+Benefit Hypothesis:
+
+Contacts/Dependencies:
+
+In Scope:
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:
+
+Outstanding Questions:",Backlog,,MAH PLSS_Cross_Platform,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F230697
+FEATURE-F230698,16479745,Feature,Retake HRA,"Problem Statement (Who, What, Where, When, Why):
+Retake the HRA should be triggered at least annually, to ensure the most up to date information is solicited from the member.
+
+Benefit Hypothesis:
+
+Contacts/Dependencies:
+
+In Scope:
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:
+
+Outstanding Questions:",Backlog,,MAH PLSS_Cross_Platform,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F230698
+FEATURE-F230836,16479745,Feature,Unified Notifications center - (Popup + Notifications page),"Problem Statement (Who, What, Where, When, Why):
+Some members currently see multiple independent popups immediately after login (eg: rewards celebration, document rejection, suppliers message) creating a noisy and fragmented experience. These popups are driven by separate systems, lack prioritization and are not consistently persisted to the Notifications page. As a result, urgent actions can be missed and the login experience feels disruptive. We need a single scalable popup framework that consolidates all popup worth messages, prioritizes them correctly, and ensures parity with notifications going forward.
+
+Benefit Hypothesis:
+If we consolidate all popup-worthy messages into a single unified Notifications popup and persist them to the Notifications page :Members will experience less cognitive overload and cleared guidance at loginUrgent activities(eg: document upload) will be completed fasterCelebration and informational messages will feel additive, not interruptiveNotifications will become a trusted system of record, not a secondary surface
+
+Contacts/Dependencies:
+
+In Scope:
+Unified Notifications popupReplace multiple independent popups with one consolidated popupLeverage the existing Custom Message popup UI as the base containerDisplay up to N messages cards per sessionCards rendered based on eligibility, priority and frequency rulesSupported Message typesCelebratory informationalDrum roll/ RewardsAction RequiredDocument Rejection (UBS only)Supplier CustomJPMC- Configured MessagesMessage prioritization & RulesMessages categorized into :Needs attentionJust for you (informational/celebratory)Notifications Page ParityEvery message shown in the popup is persisted to the Notifications PageMessages grouped byNeeds attentionTodayLast X daysSupport for read/unread state and deletion where applicableMembers should give a confirmation on deletion of messageCTA deep linkingEach messages card supports a primary CTAUpload new documentView rewards/ achievementsNavigate to supplier specific destinationMessage Deletion Confirmation Introduce a user confirmation flow for message deletion to reduce accidental data loss and improve trust and usability within the Notification experience
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:
+
+Outstanding Questions:",,,MAH PLSS_Cross_Platform,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F230836
+FEATURE-F230871,16479745,Feature,Push Notification for Personal and Team challenges visibility,"Problem Statement (Who, What, Where, When, Why):
+Members frequently miss Personal and Team challenges enrollment because visibility relies heavily on email or manual navigation into the Challenges module. If a member does not see the email or proactively enter the experience the enrollment window is effectively invisible. Push Notifications provide a timely high reach channel to notify app users at key moments in the challenge lifecycle. We need to enable push Notifications to improve challenge discovery and participation
+
+Benefit Hypothesis:
+Enable push notification for challenges availability and reminders will increase enrollment, engagement and completion by reaching members in real time at high intent momentns without relying on email alone
+
+Contacts/Dependencies:
+
+In Scope:
+Push Notifications for app users onlySupported challenge types:Personal challengesTeam Challenges - revisit ?Notification TriggersChallenge enrollment opensEnrollment closing soonEngagement /participationBasic targeting and frequency capsMetrics instrumentations (send open conversion)
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:
+
+Outstanding Questions:",Backlog,,MAH PLSS_Cross_Platform,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F230871
+FEATURE-F236210,16479755,Feature,Mobile App Adoption Experience via Smart Banner & In-App Promotion,"Problem Statement:
+A significant portion of MyActiveHealth members access MAH through mobile browsers, often after authenticating through Aetna Health or other entry points. While these users are actively engaging with MAH, many remain on the mobile web experience and are unaware of the benefits of downloading and using the MAH mobile app.Today, there is no consistent, contextual mechanism to promote app adoption based on a member's entry path or app installation status. As a result:Members miss out on enhanced mobile app capabilities and engagement opportunities.MAH experiences lower mobile app adoption and registration rates.Repeat mobile web visits continue despite the availability of a more optimized app experience.Marketing and engagement opportunities are underutilized at key member touchpoints.Business ObjectiveIncrease MAH mobile app downloads and registrations.Improve conversion of active mobile web users into mobile app users.Create a seamless path from email campaigns, direct login, and SSO journeys into the MAH mobile app.Increase engagement with high-value app features such as Goal Check-Ins, Health Actions, Daily Content, Coaching, and Rewards.Establish a scalable framework for promoting app adoption across mobile web entry points. ScopeSmart App BannerDisplay native Smart App Banners on supported iOS and Android mobile browsers to promote MAH app installation.ObjectivesProvide persistent but non-intrusive app promotion.Allow members to install or open the app directly from the browser.Improve app discoverability for mobile web users.Contextual App Promotion ModalDisplay an app promotion modal based on entry channel and app installation status.Experience MatrixEntry MethodApp Not DownloadedApp DownloadedEmail Deep LinkModal promoting app downloadLaunch directly into MAH AppDirect LoginModal promoting app downloadToast + Modal encouraging app usageSSOModal promoting app downloadToast + Modal encouraging app usage Detailed ExperienceScenario 1: Email Deep Link + App Not InstalledUser clicks MAH email deep link on mobile browser.App promotion modal is displayed.User is encouraged to download the MAH mobile app.CTA directs member to App Store or Google Play Store.User may continue on mobile web if dismissed.Scenario 2: Email Deep Link + App InstalledUser clicks email deep link.Deep link redirects directly into the MAH mobile app.User lands on the intended destination within the app.Scenario 3: Direct Login + App Not InstalledUser logs into MAH through mobile browser.App promotion modal is displayed after login.User can download the app or continue using the browser experience.Scenario 4: Direct Login + App InstalledUser logs into MAH through mobile browser.Toast notification informs the member that the app is available.Modal encourages the member to continue in the MAH app.CTA launches the installed app.Scenario 5: SSO + App Not InstalledUser accesses MAH through SSO on mobile browser.App promotion modal is displayed.User can download the app or continue in browser.Scenario 6: SSO + App InstalledUser accesses MAH through SSO on mobile browser.Toast notification surfaces app availability.Modal encourages member to launch the installed app.CTA deep links into the MAH mobile app. Success MetricsIncrease in MAH mobile app downloads.Increase in mobile app registration rate.Increase in mobile web-to-app conversion rate.Percentage of eligible users launching the MAH app after seeing the promotion.Reduction in repeat visits through mobile browser among installed-app users.Increased engagement with app-exclusive and high-usage experiences.",Backlog,,MAH PLSS_Cross_Platform,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,8/1/26 0:00,,,F236210
+FEATURE-F228286,16479745,Feature,Trackers - Daily Maximum Limit for Connected Device,"Participants:
+Tech Lead:
+
+Problem Statement (Who, What, Where, When, Why):
+At present, there is a daily maximum limit for members who manually input their tracker measurements; however, this limit does not extend to members who are directly connected to the Modern My Active Health application through their devices. Consequently, this allows some participants to manipulate their challenge entries, giving them an unfair advantage in the rankings while others are competing fairly.
+
+Benefit Hypothesis:
+By implementing a daily maximum limit for connected device trackers within the Modern My Active Health application will lead to improved data integrity and user engagement. By capping the amount of data that can be synced each day, we expect to reduce the likelihood of data errors and processing delays, resulting in a more reliable and efficient application experience.
+
+Contacts/Dependencies:
+CDPValidic
+
+In Scope:
+CDP Scope: OptionAThe daily maximum limit for trackers will apply exclusively to connected devices using the MMAH application.This daily maximum limit will affect all trackers.OptionBDaily maximum limit we be restricted from the challenge capability.
+
+Out of Scope:
+Daily maximum limit for manual entry
+
+Success Criteria:
+& Metrics: Minimize the frequency of calls concerning data sync problems.Enhance user engagement levels within the MMAH application. Definition of Done:Feature code is written, reviewed, and merged into the main codebaseAutomated unit tests are written and passManual testing is completed and any bugs are fixedFeature is tested on mobile and desktop browsersPerformance testing is completed and any issues are addressedFeature is tested for accessibility and follows accessibility guidelinesAmplitude tagging is successfully doneFeature Turn on / off fags are implementedCode is documented for future referenceFunctional testing with all components/integrations/regression (including data, pipelines) in placeClinical testing (where applicable; eg:- recommendations generated correctly )Observability (AppDynamics, Splunk, Grafana etc)Security scanningNo Sev1 & Sev2 defectsProduct owner has approved the feature and signed off on releaseFeature is successfully deployed to production environmentDocumentation, release notes, etc are updated as needed
+
+Non-Functional Requirements:
+Response Time: The data from the wearable devices or applications will arrive at the real time set by the vendor or the third party (for e.g. Validic)Scalability: the Modern MAH should be able to perform without latency with increasing number of devices/application connected with the systemData Integrity: Ensure that the data coming from the devices/application are consistent and accurateSecure: Only authorized members will be able to connect their device and get their data from the device.
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content:
+
+Accessibility:
+
+API, Endpoints, URL's:
+
+Use Cases:
+
+Assumptions:
+
+Outstanding Questions:
+----
+
+Notes:
+TeamPOCT-Shirt SizeRefined Estimate",Backlog,,CM DP MAH OPEX PLSS_Cross_Platform UXD,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F228286
+FEATURE-F231379,16479745,Feature,Explore Rewards: Maximum Incentive Reached Indicator,"Participants:
+Tech Lead:
+
+Problem Statement (Who, What, Where, When, Why):
+Within the Explore module, when members complete all configured rewardable activities for the incentive year (e.g., watching the 12 Wellness Webinar videos) and reach the annual incentive limit, the UI only grays out incentive elements. There is no clear completion confirmation. This creates confusion and unnecessary friction, as members cannot easily confirm that they have earned all rewards.Desired outcome: Display a clear, persistent completion message and remove (or suppress) incentive-related labels across applicable activities once the annual incentive limit is reached.
+
+Contacts/Dependencies:
+
+In Scope:
+Audio, Video, Article, Recipe and WebinarDisplay a completion banner/alert at the top of Explore when the annual incentive limit is reached.Remove (hide/suppress) all incentive-related labels/badges on applicable activities once the limit is reached.Remove incentive CTA states that suggest additional earningMaintain activity access if it remains beneficial but without incentive prompts. Member has not reached the maximum limit within the activity end date, then incentives should not be available (Show a message or Gray out the incentives)
+
+Out of Scope:
+Tool and Community Aid content does not have incentives.Success Criteria & Metrics: Users receive a clear completion message immediately after reaching the maximum reward limit for any rewardable activity within the Explore module.All incentive-related labels, badges, and earning indicators are removed or suppressed once the reward limit is reached.A measurable reduction in user confusion or support inquiries regarding incentive completion, indicating improved clarity and user experience. Definition of Done:Feature code is written, reviewed, and merged into the main codebaseAutomated unit tests are written and passManual testing is completed and any bugs are fixedFeature is tested on mobile and desktop browsersPerformance testing is completed and any issues are addressedFeature is tested for accessibility and follows accessibility guidelinesAmplitude tagging is successfully doneFeature Turn on / off fags are implementedCode is documented for future referenceFunctional testing with all components/integrations/regression (including data, pipelines) in placeClinical testing (where applicable; eg:- recommendations generated correctly )Observability (AppDynamics, Splunk, Grafana etc)Security scanningNo Sev1 & Sev2 defectsProduct owner has approved the feature and signed off on releaseFeature is successfully deployed to production environmentDocumentation, release notes, etc are updated as needed
+
+Non-Functional Requirements:
+Fast: Indicator loads within 300 ms with data updated within 60 seconds.Scalable: Handles peak and burst traffic while maintaining 99.9% availability.Accurate: Always reflects the correct incentive status.Secure: Protects user data with strong auth.
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content:
+
+Accessibility:
+
+API, Endpoints, URL's:
+
+Use Cases:
+
+Assumptions:
+
+Outstanding Questions:
+----
+
+Notes:
+TeamPOCT-Shirt SizeRefined Estimate",Backlog,,CM DP MAH OPEX PLSS_Cross_Platform UXD,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F231379
+FEATURE-F227471,16479745,Feature,Pathway Enhancement: Extended Pathway Completion,"Problem Statement (Who, What, Where, When, Why):
+Today, once members complete all recommended learning pathways, their pathway effectively ends. This creates a dead-end experience that:Reduces engagement and retention post-completion.Prevents members from deepening or refreshing skills (e.g., content changes, knowledge decay).Blocks motivated learners from exploring adjacent or advanced pathways.Limits our ability to maintain a continuous value cycle and habit loop within the product.
+
+Benefit Hypothesis:
+If we offer members clear options to continue after completing all recommended pathways-including:Select a new pathway (recommended, trending, adjacent skills, or role-based), and/orRetake a previously completed pathway (full retake or maintenance mode focused on refreshers and updates),then we will:Increase post-completion engagement (measured by 7/30/60-day return rates and session depth).Improve learning outcomes (knowledge retention, skills validation).Boost content utilization (more pathways started/resumed).Increase satisfaction and perceived value
+
+Contacts/Dependencies:
+IO, DP, CDP
+
+In Scope:
+Enhance experience of pathway for members who has completed all the pathways available to them: Updated pathway completion experience.Options to start a new pathway or retake a pathway (full vs. maintenance mode).Maintenance mode surfacing updated content and remediation topics.Recommendation engine enhancements (adjacent skills, role-based, trending).Amplitude analytics event trackingaccessibility compliant screens
+
+Out of Scope:
+Adaptive learning beyond maintenance heuristics.Gamified leaderboards or new badging systems.
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content:
+This is a WIP Figma: https://www.figma.com/design/1Pk0rgJGqXB4VWkEDdCb9N/My-Active-Health-UX?node-id=2602-37311&p=f&m=dev
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:
+
+Outstanding Questions:",Backlog,,IO MAH PLSS_Cross_Platform UXD,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F227471
+FEATURE-F235608,16479730,Feature,Population Health Bundle - MAH/INCV,"Participants:
+Shanthi, Amy, Veda, Sridevi, Pandi, Jyothsna, Eric, Rohith. Arun, Sundar, Adil, Frank, Ananda, Nithya, Swarna, Srini, Prakash, Ravi, Sheela, Ray B, Abrar, Salena & Suma, (Victoria, Jennifer, Lynette - Added 6-1-26), Sasi, Anu (from PCT)
+
+Problem Statement (Who, What, Where, When, Why):
+The Population Health Bundle is a comprehensive solution designed to empower Caremark with advanced tools for improving member health outcomes and driving cost efficiency. This new offering combines three powerful capabilities into a single, integrated package:MAH (Member Analytics Hub): Delivers actionable insights into member populations, enabling data-driven decision-making and personalized care strategies.LCC (Longitudinal Care Coordination): Facilitates seamless care management across the continuum, ensuring members receive timely interventions and coordinated support.MedQuery/Care Engine: Provides clinical intelligence and predictive analytics to identify gaps in care, optimize medication adherence, and enhance overall health quality.By bundling these solutions, Caremark gains a unified platform that supports population health management, risk stratification, and proactive care interventions. This feature positions Caremark to deliver better health outcomes, reduce avoidable costs, and strengthen member engagement-all within a scalable, data-driven framework.
+
+Dependencies:
+PCT Tool
+
+In Scope:
+Digital:Capability to apply the templated MAH configuration for the respective Essentials and Advantage population.Essentials includes a predefined, templatized set of Elite features. In cases where an upcoming sale creates an exception, we must be able to apply a backend adjustment to selectively disable specific features.Advantage operates like a standard Elite configuration, offering a baseline set of features that clients can toggle on or off, along with customizable elements such as messaging and logos. In contrast, Essentials uses TBD branding by default and does not allow any client-specific customization.Team Challenges:Team Challenges is NOT offered for Essentials.ONLY Preset Team Challenges offered for Advantage and by default Level1 is offered If COP (fall back plan):Advantage:Advantage Clients need to be displayed/shown in COP UI for AHM Direct business Team to configure/customize MAH capabilities.IMP user to be able to have MAH customization applicable for Advantage client.Essentials:via backend Essentials MAH template need to applied to Essentials client.IMP user to be able to have MAH customization applicable for Essentials client.LCC:Essentials gets LCC Essential (Program Info Message, Phone number, GC Topics)Defined Set, NO configurable.Advantage gets LCC FULL (Program Info Message, Phone Number, GC Topics)Able to configurableFor Essentials and Advantage GC Topics: Please refer :Population Health Bundle-MAH Capabilities.xlsx Rewards:Capability to apply the templated INCV configuration for the respective Essentials and Advantage population.Essentials: They have a choice of whether or NOT they want Incentive. If they do enable Incentive: they will get just one incentive template. (A solid list of activities and no choice). Similar to PLUS ( with no configuration)Advantage: They have a choice of whether or NOT they want incentive. If they do enable Incentive: they will have configurability within the INCV Program. Similar to PLUS (with configuration)If NO INCV product: Both Essentials and Advantage will have Standard Incentive program (Gamification related program) , similar to existing.If COP (Veda: park COP until we know the path taken is via COP, until this: path is via PCT):Advantage:Advantage Clients need to be displayed/shown in COP UI for AHM Direct business Team to configure INCV Program.Need to communicate Advantage Client customized Reports from COP to R & ABlack hawk email generation to Jane for Advantage Clients.Essentials:Via backend Essentials INCV Program to be applied to Essentials client - Similar to existing Achieve where COP doesn't cater to any customizationSSO to In App Browser:Dependent on whether SSO experience is enabled for member from CVS.If SSO experience is NOT enabled from CVS: Population Health bundle can/will go live without SSO.CVS Health APP tile for Caremark Clients (Scope for Super App Team):Capability to have Super App tile for Caremark clients.CVS retail/Super App will implement MAH tile for Caremark clients.When member clicks before they land on app store: there will be screen in between (where it says you have been redirected) develop by source team (CVS super App) based on branding.LOB for Population Health Accounts:LOB logic to apply on MAH (Veda: Dependency is F231511)Capability to apply LOB related content/messages at downstream so the population can view the content on the MAH platform.
+
+Assumption:
+The Entitlement domain will provide the new Line of Business (LOB) for Population Health accounts to downstream domains. (business as usual)Standard Reference Data ((Veda: partially Dependent on F231511 and partially depend on PCT ) Standard messages, themes, branding, phone numbers, etc., from the product variant will continue to be shared manually on a bi-weekly basis with downstream domains and APIs as part of the supplier onboarding process. (Business as usual)MAH/AEM will store standard content data for this new LOB.Validation on MAH:Integration/E2E/Regression testing for all MAH capabilities on MAH application for Population health bundle members data.LCC Coaching validations based on new coach campaigns and schedules.NOTE: NO impact to MAH w.r.t new coach campaigns beside testing w.r.t new coach campaign and schedules.Eligibility / Entitlement validationIncentive Program validation on Rewards Health checklist and rewardable digital activities.Essentials (with incentive product and without incentive product).Advantage (with incentive product and without incentive product)CDP:Integration testing (Jaguars) : Set up the LCC Advantage and Essential, Population Health Data in the lower environment, so that the MAH team can perform testing as part of the downstream integration testing of the Population Health bundle product suppliers.End to End test support (Note that Caremark PLSS Onboarding data made available in AHM GCP PostgreSQL via other features, MAH consumes that Caremark data). CMSupport E2E testing support related to MAH SSO integration from EPICTwo new Incentive Activities will be added to the existing API responseChanges to process New attribute in the existing APIComplete Registration and First-Time Login on Mobile App activities will be displayed in Incentive tabs with Completed or Pending or Reward Earned statusNewly added Activities will be visible via SSO flows, Incentive and Account Manager ViewsNo changes to existing TMV/Incentive workflow tabTest data creation and validation supportTMV UAT and E2E testing support IO Scope:Support E2E Testing - added userstories for MAH E2E validationDependent on CDP for test data setupF231438: PHB: Clinical targeting platform - support population health bundle validation processF228052: Placeholder: Clinical Targeting Platform: Go Live SupportF228071: Communications - Population Health BundleR&A: R&A scope capture in F228194 PCT Scope:Consume the new activities from Incentive engineMake the new activities are available for below listed MAH variants;EliteEssentialAdvantageAdd the new activities part of the templates
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules No Automation for Data Configuration:Data flow from the new onboarding portal (PCT) to respective domain (MAH Digital domain/INCV domain). Setup will remain manual (By BW Team)Backup plan: If PCT NOT ready in time, Data flow will be from COP to respective domain (MAH Digital domain/INCV Domain). Setup will remain manual (By BW Team).On the Validic side we don't set branding.If gift card is an option: At Black hawk we need to setup separate campaign code (Billing should be at different bucket NOT to Aetna bucket or AHM bucket)Preset Team Challenge cadence will be same as existing for any other LOB.S & O and BiweeklyBiweekly team work with PCT team to make compatible existing product and incentive configuration scripts with PCT to update the data in the respective downstream domainsWe will NOT have line values for Essentials and Advantage since this is NOT Aetna.Communications to have one branding for Population Health bundle.Population Health Bundle will be customized as needed based on being Advantage by AHM Direct Business Team (Amy Heifetz team)Artifacts:Please find Member Registration scenarios: memberregistrationscenarions.xlsxFigma link: https://www.figma.com/design/1Pk0rgJGqXB4VWkEDdCb9N/My-Active-Health-UX?m=auto&node-id=40051484-183…Essentials and Advantage INCV related : PHB.xlsxEssentials and Advantage MAH related capabilities: Population Health Bundle-MAH Capabilities.xlsx
+
+Outstanding Questions:
+----
+
+Notes:
+Note: R&A scope capture in F228194 IO - Junaid/Salena - 15 points CM - Ravi/Sheela - 10 SP (Range Rover=2, Dodge=3, Avanti=5) Team / TrainPOCPointsIOJunaid/Salena15CMRavi/Sheela10DPPhalguni / Jude / Divyank40DP (Incentives)Shikha/Eric60R&A scope capture in F228194CDPManav6 (Jaguars, Test data setup)PCTAnu COP 2/18/2026:MAHFor Achieve/Engage/PLUS/CORE MAH configuration: Nothing done by BW at supplier level.MAH domain has all default values of MAH configuration and they display by looking at supplier being achieve/engage/Core when population login on MAH platform.Essentials---What do we do? MAH Domain change or BW to apply MAH Template?Incentive:Achieve/Engage: BW created INCV Program TemplatesBased on requirement from INCV BW created 108 INCV Program templates related to Achieve/Engage. ONLY dates change within these 108 INCV programs. These are created during the Jan of academic year. BW will have 108 Program ID's for these INCV programs.Who is mapping this one of this 108 INCV program to the Achieve/Engage supplier: Done at CDP (via code). from Lynette o 6/15/2026:Essentials:Is Gamification ON/OFF required for this program? Gamification ON LK - correctParticipants supported? - Program will be available for all types of participants , but this needs to be configured during the implementation by IM team manually. It is not a predefined attribute. LK - correctIs this a completion-based program only, or are there any other redemption types supported? Completion based LK - correctWill the program support only one goal, or multiple goals? Lynette to clarify LK - for Essential, one goal only , should work similar to PLUS variant set-up.What is the maximum goal value that can be configured? Lynette to clarify LK - for Essential, one goal, should work similar to PLUS variant set-up.Is any reporting-only program expected under Essentials? Lynette to clarify , I guess there are none LK - not in scope at this timeWill there be one single program covering all Essentials variants/suppliers,or different programs with the same set of activities? We would like to confirm that there should be no overlapping dates across programs, in order to avoid reporting conflicts. Lynette to clarify LK - I am not sure I understand the ask, but each client would have the same the program start and end date. Advantages:Gamification ON/OFF? Gamification ON LK - this would be configurable, same as we do for Elite variant.Different redemption allowed? Like Hearts, Points, or Dollar? Hearts for sure, Lynette please confirm if the points and dollars are also be configured. LK - Hearts and Dollars should be available, as well as completion.How many Goals are supported? Same as ELITE:5? Lynette to clarify, by default we will be creating one. LK - yes, same as Elite, can have up to 5.",Backlog,,Audi CDP CDP_ready CM DP IO Jaguars MAH PLSS_Cross_Platform R2D2 RA,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F235608
+FEATURE-F227651,16479755,Feature,Provide Connect the Device activity to Clients,"Participants:
+Tech lead: Architect:Business Stake holder:
+
+Problem Statement (Who, What, Where, When, Why):
+Connect the Device
+
+Business Value:
+
+In Scope:
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:",,,Brighton Incentives PLSS_Cross_Platform Rewards,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F227651
+FEATURE-F196239,16479755,Feature,"Modern MAH: Support Member Timezone for Incentives, HRA, Explore , Pathway, Challenges , Giftcard Rewards, Health Checklist","GDP Kanban Date: 2/13/25
+
+Participants:
+Shikha, Mothi, Sridevi, Sapna, Rohith, Swati, Krishna, Mohamad, Sobha, Kishore. Ajay, Sundar, ShenyanTechnical Lead: Sridevi LoB: Core, Achieve, Engage, Plus and Elite SuppliersPlatform: Web, Mobile
+
+Business Value:
+Member Engagement and Retention: Maximize efficiency in rewarding in honoring member's local device timezone to track the activities accurately and reward them correctly.
+
+Non-Functional Requirements:
+<List non-functional business drivers here>
+
+In Scope:
+Below are the MAHM modules to track members local timezone when member post the activity and view the activity ModuleImpacted workflow with timezoneTeamsLogin/RegistrationWhen member registered registration transaction to be posted with member Timezone Chelsea, CDPHRAWhen member submit HRA , the HRA activity transaction and incentive Activity transaction to be posted with member Timezone to domain.Member should view theirHRA completion status/incentive rewards based on member timezone Arsenal(5),CDP,FulhamPathwayWhen member submit Pathway check-in/Goal completion/Pathway completion, the pathway activity transaction and incentive activity transaction to be posted with member Timezone to domain.Member should view their Pathway check-in completion status and incentive rewards based on member timezone Arsenal(25),CDP,FulhamMood Check-INWhen member submit Mood check-in , the Mood check-in activity transaction and incentive activity transaction to be posted with member Timezone to domain.Member should view their mood check-in completion status and incentive rewards based on member timezone Chelsea,CDP,FulhamMental Health-inWhen member submit Mental health check-in , the Mental health check-in activity transaction and incentive activity transaction to be posted with member Time zone to domain. Member should view their mental health check-in completion status and incentive rewards based on member time zoneChelsea,CDP,FulhamHealthactions feedback completeWhen member submit Healthaction feed back submit , the health action activity transaction and incentive activity transaction to be posted with member Time zone to domain.Member should view their Health action feedback completion status and incentive rewards based on member timezoneTottenham(10),HI,FulhamHealth checklist Incentives activity completionWhen Member submits incentive activities from healthcheckllist, the incentive activity transaction to be posted with Members timezone to domain.Member should view their completed health checklist incentive activities based on member timezone Arsenal(5), FulhamReward redemptionWhen member redeem rewards the redemption transaction to be posted with member Timezone ,Nottingham(10),CDPdevice connectWhen member click on device connect , the device connect activity transaction and incentive activity transaction to be posted with member Timezone Member should view their device connect status and incentive rewards based on member timezoneWolverhampton, FulhamExplore content When member submit content complete in Explore/Pathway recommended/ Mental health/Health action workflows , the content activity transaction and incentive activity transaction to be posted with member Time zone, Member should view their completion status and incentive rewards based on member timezone in all Explore/Pathway recommended/ Mental health/Healthaction workflowsTottenham(15),FulhamPersonal ChallengesWhen member enrolled personal challenges the incentive activity transaction to be posted with member Time zone, Member incentive rewards status to be shown based on member timezone Leicester city, FulhamTeam ChallengesWhen member enrolled Team challenges the incentive activity transaction to be posted with member Time zone, Member incentive rewards status to be shown based on member timezone Leicester city, FulhamExplore Content Recommendation Survey Tottenham (5) GDP and BDP Scope:Incentives Scope:Below MAHM module workflows all Post and get APIs to be implemented with members local timezone while member posting the activity and view the completion status.below respective module Domain data model and APIS to be enhanced with timezone attributesIncentive Get APi to be enhanced with timezone attributes. Note: Incentive Set API and data model is ready with timezone and MAHM UI to BFF with POST incentive API integration need to be implementedBFF APi to utilize Timezone utility to integrate with domain POST and GET APIS of respective module and incentivesModules HRAHealth ActionsMood check-inMental Health check-inPathway -check-in , goal completion , level completion, journey completionExplore Recommended content , Mental Health content , Health action content , Explore Personal Challenges enrollment with incentivesTeam Challenges enrollment with incentives integration device connect with incentive.Reward Redemptions/Giftcards Health Checklist
+
+Out of Scope:
+
+Success Criteria:
+& Metrics: Member activity will be tracked for activity completion and participation as per their Local Member Timezone for all the listed modules.Integration and E2e validation required with member local timezone for all post/view member digital activities and incentive activities base don members local timezone for above tabular mentioned MAHM modules.
+
+Assumptions:
+<Bulleted assumption items here>
+
+Dependencies:
+on Testing- Test Data setup for all offerings of MAHIntegration Testing Require? Yes Architectural Considerations: Supporting links: Solution Sketch: https://lucid.app/lucidchart/0866e1cc-5c07-4fb9-a52e-f6ca21a6beb0/edit?viewport_loc=-405%2C-316%2C3163%2C1469%2C0_0&invitationId=inv_75df08ac-ff01-4c99-a1df-1bb7b6eab79c Solution confluence page https://cvsdigital.atlassian.net/wiki/spaces/ADA/pages/3360326552/Time+format+for+transactional+data+on+MAHM+Impacted+modules+with+workflows+with+new+solution with all MAHM capability workflows and business fields and which release we can plan to work to be captured from respective train teams. Estimation Document: TimeZoneScope change.xlsx (sharepoint.com)Member timezone meta data solutionhttps://cvsdigital.atlassian.net/wiki/spaces/ADA/pages/3392668426/Design+and+Solution+for+timezone+issue+in+Modern+MAHBFF_UTILITIES - User Type Audit Details (Audit Tracking) & Time zone - AHM Home - Confluence Reference of implementation for Challenges modulehttps://cvsdigital.atlassian.net/wiki/spaces/ADA/pages/3707568500/Team+Challenge+BFF Definition of Done:Feature code is written, reviewed, and merged into the main codebaseAutomated unit tests are written and passManual testing is completed and any bugs are fixedFeature is tested on mobile and desktop browsersPerformance testing is completed and any issues are addressedFeature is tested for accessibility and follows accessibility guidelinesAmplitude tagging is successfully doneFeature Turn on / off fags are implementedCode is documented for future referenceFunctional testing with all components/integrations/regression (including data, pipelines) in placeClinical testing (where applicable; eg:- recommendations generated correctly )Observability (AppDynamics, Splunk, Grafana etc)Security scanningNo Sev1 & Sev2 defectsProduct owner has approved the feature and signed off on releaseFeature is successfully deployed to production environmentDocumentation, release notes, etc are updated as needed CDP Train Scope For the below capabilities, the corresponding services/APIs should have the ability to capture member time zone information .[Audi, Genesis]Mood Check-inMental Health checkRewards Redemptions/Gift CardsHRAProfile Ability to support event update and data synchronization [ Genesis]Postgres to BQ syncup with the time zone information for the below capabilities [ Chrysler]LoginRegistrationProfileHRAPathwayMood Check-INMental Health-inReward redemptiondevice connectExplore content Personal ChallengesTeam ChallengesIO Train Scope For the below capabilities, the corresponding services/APIs should have the ability to capture an retrieve member time zone information .Health action feedbackFrequency : N/ADelivery Method : N/ANFRN/AOut of Scope N/ASuccess Criteria and MetricsThe Member Time Zone information should be captured successfully for the Modern MAH capabilitiesSupport E2E Testing with downstreamIntegration Testing Required (Y/N)YesAssumptionsN/ADependenciesGDP, BDP
+
+Outstanding questions:
+N/A N/A ----
+
+Notes:
+TrainFocus AreaRefined EstimateT-shirtPOCGDP Tottenham=25 ptsLeicester City= XS(10)Wolverhampton= 10Chelsea=10 IODB + Domain APIHI-SSShenyanBDPIncentive, JourneyArsenal=35 ptsNottingham=10 ptsFulham=25 pts Divyank/Shikha/Brittany/PhalguniCDPTrackers, device dataAudi - 40Mercedes - 40Chrysler - 20L",,,Arsenal Audi BDP CDP CDP-Ready Chelsea DP GDP IO Incentives Leicester_City MAH PLSS_Cross_Platform Rewards Technical_Health Tottenham Wolverhampton,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,1/1/25 23:59,,F196239
+FEATURE-F227728,16479755,Feature,Introduce Rewards History to the member,"Participants:
+Phalguni, Binit, Rohith, Shikha, Mothi, Mohd Ansari, Ananda, Parthibanand (TMV), Sundar, ArunKumar, Krishnappan, Sridevi, Priya, Eric, Jay Carroll, Cyndi, John, Victoria, Adil, Frank, Srini, Prakash, AnitaTechnical Lead: Mohd AnsariBusiness: Leah Briggs, LynetteLoB: Plus, Achieve, Engage and ElitePlatform: Web, iOS, Android
+
+Business Value:
+Members earn and redeem rewards across multiple programs configured by the suppliers. Today members lack a single trustworthy ledger that shows what they have earned, when, from which program, and how/when it was redeemed or adjusted.Introducing a view of """"Rewards History"""" including all all transactions like Earnings, Redemptions, Roll over and Expiration will provide user with a complete traceability into all the credit / debit transactionsImprove transparency and trust with members and reduce operational overhead in terms of support calls we get for Rewards History,
+
+In Scope:
+SummaryImplement a feature that allows members to view their rewards history from previous years - up to 3 years (assumption based on roll over period - current + previous 2 years). Abhishek: 3 Years is fine.Should we include an """"informational message"""" somewhere indicating that only 3 year history (based on completion date is seen)?This will provide a user with insights into activities that earned them specific rewards, helping them track their progress over time and encouraging continued participation.The definition of this feature considers 3 important aspects for a historical reward transaction: What Changed, Who Changed, When it Changed.Who can see 'Rewards History''Rewards History' will be accessible from 'Rewards Drawer'. Only those users that can see 'Rewards Drawer', will be able to see 'Rewards History'What will be included in Rewards History?Orientation:History display will be oriented from a point of view of """"Activities"""" and will list all complete activities along with additional information around the transaction.This may need to be relooked at. Current design is showing all activities in chronological order and we need them filtered / sliced by plan year and type .Activity Name:Name of the Activity completedTransaction done by:Relationship Type and Name (First name and Initial of last name will suffice). See mockup for examples.Show """"You"""" for the context of logged in user (instead of showig their name)For non family scenarios where member has no associated dependents, the name tag on the transactions can be avoided as each transaction will have the same name.Include additional text """"Agent Assisted"""" where applicable (see mockup)Where the transaction was not done by an individual and it is a system activity (like roll over or expiration), just show """"System"""" instead of 'Relationship Type and First + Last Name'Rewards EarnedQuantity of rewards earnedCurrency Used (Hearts / Points/ Custom / Dollar etc. as configured)Dollar valueShow a dollar value where conversion to $ appliesEligible redemption type tied to this earning:Gift Card / HRA / HSA / HIC/ Reward Dollars/ <Custom>Good to have - The tag for redemption type is needed when you are looking at the comprehensive view but when viewing this history from inside a goal (tied to a single redemption type), all transactions will have the same value. We can hide the tag in this view. Good to have and not a necessary requirement.Transaction DateSee mockups for the formatRewards RedeemedQuantity of rewards redeemedCurrency Used (Hearts / Points/ Custom / Dollar etc. as configured)Redemption type ('Gift Card' alone)All other redemption types are reporting only and we keep accumulating hearts/balance until the end of the year and which ware periodically reported to employer. There is no redemption or feedback loop. No use case to show redemption or deposits in account for such transactions.Consider linking to gift card """"Order History"""" where applicable.Rewards Rolled overRollover balance will not show up strictly in the history section but will show up under """"Funds for gift cards"""" section of the gift card goal (only one gift card goal possible)Rewards ExpiredQuantity of rewards expiredCurrency Used (Hearts / Points/ Custom / Dollar etc. as configured)Current mockup doesn't include it? Do we need an entry? This however can only be seen at overall level and doesn't make sense when filtered for a specific goal. Additional UI interactions:Filters - Good to have and depending on how UI design works.Goal nameTransaction Date RangeTransaction done by (Member / Dependent Name)Transaction Type (Earning / Redemption) SortingNewest - Show transactions in descending order based on """"Transaction Date"""" - Last transaction to be seen on topReward Type - Ascending Alphabetical (A to Z) orderPlan Year - Descending (recent /current year at the top)Pagination:Depending on the UI design, allow for pagination. Default number of records per page to be defined based on App / Web Specific Cases / Informational Messages:Certain activities may not earn rewards until you have completed all the related activities - This is to avoid confusion around Gatekeeper activities , parent / child , multi instance activities etc. Do we show such activities based on current design? Will they not show a heart value or dollar value? Need to determine the exact treatment of such itemsCompletion of 3rd party activities (completed outside of this platform) like 'Annual Physical' are tracked using claims data and may not show up here until the claims are processed. Exact text to be defined by business.Any other relevant information that needs to be shown always or conditionally? Abhishek: NoSupport different programs - Hearts/Points dollar based and Completion basedProgram / Supplier change scenarios:Plan Sponsor Change - if a member moves under a new plan sponsor (employment change), the rewards history from previous plan sponsor should not be visible anymore and history shall be fetched and displayed only from current plan sponsor.Program ID Change while the Plan sponsor remains the same -Program Dates Change while the Plan sponsor remains the same -Supplier ID Change within the same Plan Sponsor - Activities completed while a previous supplier was in effect but was processed and incentivized under a new supplier id - Digital vs External activities??Family Scenario:In case of family, every member can see rewards history for the entire family (same information). This is a continuation of rewards drawer experience. This will be extended to the Rewards history as well.Additional requirements covered under """"Transaction done by:"""" section above UX Design: My Active Health UX - Figma Questions:Configurability and Limitations:Which variants will this feature be applicable for? Abhishek: Plus, Achieve, Engage and Elite.Do we need to tie up the availability or visibility of """"Rewards History"""" as a configuration at Variant, Program or Supplier level in COP? Abhishek: Make this configurable to be turned on or off at supplier level (COP) for all the 4 variants mentioned aboveAny other limitations or restrictions (apart from this which is covered above - """"Only those users that can see 'Rewards Drawer', will be able to see 'Rewards History')? Abhishek: Can't think of anyWhat is the level of client commitment? Abhishek: High importance. Not sure of the exact client list and if there are specifics around that commitment which are not covered here. Need to also consider the opportunity cost as this will need to be worked by Nottingham, mostly. Do we need to include """"Completion"""" only suppliers? Abhishek: Yes, we shall keep it for completion only as well as hybrid situations (where we have completion + other reward type)What would be the behavior for hybrid setup where user have both completion based and redeemable currency based goals and earnings?. Abhishek: See above point. Needed for hybridWhat happens when the currency is changed by the client to some other currency time? How does it impact Rewards History? Abhishek: Show some indicator to mention that rewards configuration changed. We can show basic details as a transaction and ask the member to contact """"Benefit Manager"""" for details. Include, basic like - currency change and effective date of the change.What happens if INCV = TRUE but Rewards is not yet setup? Safe to say history will not be shown until you are able to see the drawer? Abhishek: YesShikha: How to treat Migration upon renewal for showing the rewards history? Will it suffice to just show the amount that """"rolled over"""" from on prem to modern upon migration? Abhishek: Yes, treat it as a standard rollover. Don't need to mention Platform details.Shikha: Let's include Family Max capability as well to display in incentive history as This applies for all redemption types. Do we need to consider anything else apart from what is already covered above? Abhishek: No. We have covered the need.Shikha: If program ends, renews again with 1 year gap -Then we need to display incentive history (considering # of years) Abhishek: We will show the history. If we have this history data from the past available, we shall include it (subject to max period for history). Not necessarily MVP.If a user changes employer (plan sponsor) or even just the supplier within same plan sponsor (program or supplier changes) - Do we need to show the history from previous supplier / Program? If yes, need to define the exact scope. Abhishek: We shouldn't carry over from one supplier to another as member can't use those point anymore. It may confuse employee as well as employer. Confirmed by Lynette via chat on 2/4/26 - No need to carry over any history from previous supplier and history data shall reset upon supplier / plan sponsor change.Any dependencies or considerations around TMV system? """"Agent Assisted"""" earnings and redemptions have already been covered - anything else?Does the history need to become available TMV? Now or future? - Abhishek: Likely not, but we need to confirm this with Business / nITBTemplate - Below is an example of use case """"Rewards Earned"""" - Each transaction type will be slightly different data points. Actual UI design don't need to be a table. See examples below under UX/UI sectionTransactionQuantityBalanceTransaction done byTransaction Date<Transaction Name>:Currency: <Earned Currency>Activity: <Activity Name>Eligible Redemption: <Redemption Type Possible><Number><Number>Member: <Member First and Last Name>Spouse: <Spouse First and Last Name>Dependent: <Dependent First and Last Name>System (Where applicable) Show """"Agent Assisted"""" as additional information where the activity was completed by agent on behalf of member Where applicable show """"Family"""" or """"System"""" instead of individualMM/DD/YYYYUX/UI ContentThis is a rough sketch showing the data that needs to be captured for visualization. Table may not be the right way of showing these details on mobile apps. This sample will be replaced by Figma mockups once design team comes up with proper screen designsUX work being done as part of enabler feature F219307 --------------------------------------------------------------------------------
+
+Out of Scope:
+Future considerations:Status for 3rd party activities that are marked completed in the MAH system but is waiting on claims data - Do we need to and can we show some rewards as """"Pending"""" (while waiting on claims data) or """"Denied"""" (if claims data doesn't support this) - Might be quite complex and overkill for history. Can evaluate in future after MVP.Download: Allow for a """"Download"""" (PDF/Excel) option which shall download the entire history that a user is able to see on the screen, across pages. The transactions seen on the download must match the UI (no more, no less).
+
+Success Criteria:
+& Metrics: % of members viewing history Changes to support tickets volume for Rewards history - @Phalguni Vats and @Shikha Puri will collect additional details on how many users are reaching out, time spent and dollar spent (Requested by UX)
+
+Non-Functional Requirements:
+Rewards can load on the UI """"On demand"""" i.e. when a user asks to see the historyLoad time shall be minimized / optimized from a engineering solution perspective to avoid end user frustration. Reference: Feature review with business: Meeting Recoding: 11/24/2025 - Binit, Abhishek, Shikha and Phalguni : Rewards History - Feature review-20251124_083446-Meeting Recording.mp4
+
+Dependencies:
+
+Integration Testing:
+Require ? Architectural Considerations: Supporting links: Rewards Drawer.docx ----
+
+Notes:
+Nottingham - 60 - UI + BFF - implementation for only 1 module Pathway",Ask,,Audi CDP CM Incentives MAH PLSS_Cross_Platform RA Rewards TechWriting UXD,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,8/1/26 0:00,,,F227728
+FEATURE-F222994,16479962,Feature,MMAH: Family Max Rollover,"Family Max: , Jay, Victoria, Priya, Ananda, Patil, Nikhil, Parthiban, Mrudala, Ajay, Sridevi, Ananda Eric, John Trotti, Mohd, Mothi, Prakash Business
+
+Participants:
+Abhishek, Leah B
+
+Business Value:
+Gamification: To allow for undisrupted progress on a user's wellness journey, we will be offering the ability to roll over incentives from one plan year to the next for all product variants that include incentives. This aligns with the intended gamification goal of the product. Increases Engagement : Encourages Engagement by offering a more flexible and rewarding structure.Increased Program Adoption: Encourages participation by offering a more flexible and rewarding structure.
+
+Non-Functional Requirements:
+Functional Requirements:DP Scope: Once family max is hit, any individual who did not redeem their earnings below the max will have those earnings rolled over to the following year considering the Family Max. Kindly refer the attached Rollover use case spreadsheet.Rollover = earnings not redeemed below the max. Only earnings can rollover. Expiration: Hearts will expire 3 years after they're earned, based on the plan year in which they are earned. 3-year expiration is not configurable. If rollover = yes, expiration = 3 years.Users must complete gateway activities to be able to use rollover capability. Rollover hearts should be allowed to redeem even if gatekeeper are not completed in subsequent plan year. Rollover is available to gift card programs only and should be configured at program level. CDP scope:
+
+In Scope:
+E2E testing of API and Services enhanced for feature F157756Out of Scope
+
+Success Criteria and Metrics:
+E2E testing is conducted successfullyIntegration Testing Required (Y/N)YesAssumptionsN/ADependencies R&A Scope:
+
+Assumption:
+Rollover amount will be included in the total earnings sent to reporting . Rollover amount will be stored in INCV and available to be ingested by Datamart.1. Need to Ingest rollover amount 2.Need to add logic to show how much was rolled over CMC TMV Scope:This feature is an enhancement on the Incentive rollover feature worked on within TMV. We have a property family max which is being used to check the incentive amount available for redemption for the member. We will conduct E2E testing to asses impact on workflow and ensure that if there is any impact due to these new conditions, existing logic will be modified.
+
+Out of Scope:
+New API integrationSuccess Criteria & Metrics: Correct Family Max amount is shown within TMVRedemption amount is accurate for the member No new API integrations
+
+Dependencies:
+Incentive API team
+
+Integration Testing Required:
+Yes & Metrics: CDP , R&A Require :YesArchitectural Considerations: Supporting links: ----
+
+Notes:
+Static on report(R&A)-Family Max for subsequent plan yearDynamic and static reporting for Family Max from incv end. Reporting can extract those dynamic values from incentives view and can report for Family Max for subsequent years.TrainTeamEstimates FulHam- CDPAudi ((E2E Testing)10CDPMercedes (E2E Testing)10CMCRange Rover -TMV (E2E Testing)10DPNottingham15R&AR&A-Mercury 20DPFulHam85 pts",,,AHM-Range_Rover Audi CDP CMC DP Fulham Incentives MAH Must_Have PLSS_Cross_Platform RA RA-Mercury Rangerover Rewards UXD,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F222994
+FEATURE-F224114,16479745,Feature,Agent-assisted gift card redemption - Update Member's Address and Contact info,"Problem Statement (Who, What, Where, When, Why):
+Engagement Specialists (ES) lack the tools to efficiently support members during gift card redemptions. For a population that is not digitally savvy and might not have digital devices, email address and phone numbers ES might want to help them update their information on the call. To enhance the holistic experience for our members and improve the efficiency of Engagement Specialists (ES), we aim to implement a system that allows ES to update multiple or alternate addresses and email addresses without OTP verification. Additionally, providing easy access to previous conversation notes will enable ES to deliver accurate information and maintain continuity in support. These improvements will optimize call time and elevate overall member satisfaction.
+
+Benefit Hypothesis:
+Allowing members to update their addresses, email id and phone number will enhance their experience, particularly for those who frequently relocate, ultimately increasing member satisfaction and retention. Additionally, by implementing a dedicated ticket search capability, we hypothesize that ES will be able to access ticket information more efficiently, leading to quicker resolutions and improved communication with members.
+
+Contacts/Dependencies:
+
+In Scope:
+Ability to add and manage multiple addresses for the members who are not digitally savvy to be able to send them physical gift cards.Ability to update members email id and phone number for members who are not digitally savvy - do not use traditional digital devices, cannot verify with OTP Ability to expand the service of attesting to activities and ordering gift cards to all other suppliers in addition to the SONJ suppliers? i.e. BoB Show order history for gift cards to the ES on the Incentives tab Ability to add a note to an existing noteFlags visible at member profile level (TPA - Third Party Administrator, ROI - Release of Information and POA- Power of Attorney)Allow searchability/accessibility of previous conversations with the member to the ES to enable pre-call, on-call and post-call research
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:
+
+Outstanding Questions:",,,Incentives MAH PLSS_Cross_Platform Rewards,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F224114
+FEATURE-F235034,16479755,Feature,"Leverage Reported Amount and Date as """"redemption"""" for Non Gift card (HRA/HSA/HIC) goals.","Participants:
+Phalguni, Binit, Shikha, Mothi, Mohd Ansari, Sridevi, Priya, Eric, Jay Carroll, Cyndi, John, Victoria, Adil, Prakash, ParthinabandTechnical Lead: EricBusiness: Leah Briggs, LynetteLoB: Plus, Achieve, Engage and ElitePlatform: Web, iOS, Android
+
+Business Value:
+Current State - Gift CardAvailable heart balance reduces as you redeem them Redeemed amount is shown as “redeemed” towards max limits, where applicableCurrent State: Non-Gift CardAvailable heart balance NEVER reduces and only increases with earning. The corresponding value is always seen as “earned” towards max limit, where applicableWhat's Missing?The UX behavior for non-gift card is not consistent with gift card, creating confusion in member mindsMembers associate “Available hearts” with something they can still redeem or use in some way. If the count does not reduce (even if we already reported to the employer), some members expect to be able to use these available hearts and wonder how.This confusion is further multiplied by lack of information around 'how the reporting works' and transactional details around 'when was an amount reported'. Missing instructions which should direct members to contact their employer for questions related to deposits in their account. This increases support burden for MAHThese assessments are supported by substantial number of support tickets / member enquiries, with a theme of """"How do I use my Hearts?""""What shall we do?Standardize the workflow for non-Gift card to be consistent with Gift cardsOnce an amount has been “reported”, consider it as “redeemed” and present this information to membersLeverage “Reporting Date” as a criteria and milestone. Add help text for members to understand when and how this works and who to contact in case they have questions around these amounts or missing/delayed account deposit .Include “Reported” transaction in Rewards history (when introduced). To include - Reported Date, Reported Amt, and other relevant transactional details.Reference proposal / solution documentation:Reporting Date for Non-Gift Card Redemptions.pptx
+
+In Scope:
+Once a Non Gift Card Goal related earning is reported to the client, reduce the member balance by corresponding amount (both dummy currency like heart/points etc. and the converted dollar value) - on similar lines as Gift card redemptionThis will need new work for R&A to share / make available relevant data with incentive team who in turn will make it available to the UIInformation needed will include, Client / Supplier info, Member info, Identification of correct report to be used in different scenarios, Reported Amount transaction Details, Reported Date transaction details. Make the methodology abundantly clear to the members using help/informational text.Inform that MAH reports these earnings to the employer who in turn are responsible for depositing the money to member accounts or reimburse in any relevant way. MAH is not responsible for the steps here on and members shall contact their employer for any questions related to deposit dates, amount etc.Include the date on which MAH reports a certain earning to the employer - This will need to be based on the report that is relevant for the specific setup. Additional discussion, analysis and definition is needed (MAH DDAT and Business Product + R&A Team) UX Design:Reference proposal / solution documentation: Reporting Date for Non-Gift Card Redemptions.pptxFinal / Actual UX : TBD Questions:
+
+Out of Scope:
+TBD
+
+Success Criteria:
+& Metrics: Reduction in number of queries / support tickets around """"How do you use my hearts balance?"""" or """"Money has not been deposited to my account"""".Increased member satisfaction scores
+
+Non-Functional Requirements:
+Reference: Feature review with business: Meeting Recoding: 11/24/2025 - Binit, Abhishek, Shikha and Phalguni : Rewards History - Feature review-20251124_083446-Meeting Recording.mp4
+
+Dependencies:
+
+Integration Testing:
+Require ? Architectural Considerations: Supporting links: Rewards Drawer.docx",Backlog,,DP Incentives MAH PLSS_Cross_Platform RA Rewards TMV TechWriting UXD,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F235034
+FEATURE-F235043,16479755,Feature,MAH - Rewards - Enhancements to Email Campaigns,"Participants:
+Phalguni, Binit, Shikha, Mothi, Mohd Ansari, Sridevi, Priya, Eric, Adil, Suma KilapratiTechnical Lead: Mohd AnsariBusiness: Leah Briggs, LynetteLoB: Plus, Achieve, Engage and ElitePlatform: Web, iOS, Android
+
+Business Value:
+Refer to following Deck: Rewards - Email Campaigns - Enhancements.pptx
+
+In Scope:
+Introduce NEW Email Campaigns:Rewards - Periodic Summary Email - Introduce a periodic (like Monthly) rewards summary email to improve member engagementNew Member - Enough Hearts for a Gift Card - Introduce an email for new members who accumulate enough points/hearts to redeem their first (lowest denomination) Gift cardGift Card - Order Shipped - Currently, MAH only notifies member upon successful order placement. Need to introduce an email to update when the card is shipped.Gift Card - Order Failed - If a gift card order fails at any stage, member is not currently notified and stays in the dark. Need to introduce automated email alerts with NEXT STEPS for the member.Update Existing Email Campaigns:Gift Card - Order Success Email - The current template is not very efficient in communicating key details to the members. This needs to be redesignedSome clients have custom emails setup and they will need to be evaluated and a decision will need to be made - if we keep them as is or enhance them as well or if a client agrees, replace the custom with new enhanced template.Gift card redemption Email Templates - AHM Home - ConfluenceFor NEW emails, get alignment if all of them can be standard or if a custom work is needed for some clients. UX Design:Reference proposal / solution documentation: Rewards - Email Campaigns - Enhancements.pptxFinal / Actual UX : TBD Questions:
+
+Out of Scope:
+TBD
+
+Success Criteria:
+& Metrics: Reduction in number of queries / support tickets around """"Where is my Gift card?"""", """":Why have I not received my Gift card?"""" etc. which forms significant % pf support ticketsIncreased member satisfaction scores
+
+Non-Functional Requirements:
+Reference: Feature review with business: Meeting Recoding: 11/24/2025 - Binit, Abhishek, Shikha and Phalguni : Rewards History - Feature review-20251124_083446-Meeting Recording.mp4
+
+Dependencies:
+
+Integration Testing:
+Require ? Architectural Considerations: Supporting links: Rewards Drawer.docx ----
+
+Notes:
+Nottingham - 60 - UI + BFF - implementation for only 1 module Pathway",Backlog,,IO Incentives MAH PLSS_Cross_Platform Rewards TechWriting UXD,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F235043
+FEATURE-F235140,16479755,Feature,MAH - Rewards / Incentives - Improve Error Handling,"Participants:
+Phalguni, Binit, Shikha, Mothi, Mohd Ansari, Sridevi, Priya, Eric, Technical Lead: Mohd AnsariBusiness: Leah Briggs, LynetteLoB: AllPlatform: Web, iOS, Android
+
+Business Value:
+Currently Modern MAH doesn't have a robust and graceful handling of errors. As confirmed by Engineering Managers and POs, we just show a generic error message saying """"Oops something went wrong"""" for numerous scenarios including session time outs, API call failures etc.This leads to bad user experience and we this reported by members in multiple app review comments and support tickets. The plan is to update this experience such that the error messages are more user friendly which provides members with context of why the error occurred (where possible) and what they can do next. Reference:F227859: [App Store Reviews] [ANALYSIS] MAH Platform - Improve Error Handling | Rally - This feature is where the initial analysis around existing workings was done.
+
+In Scope:
+Scope of this feature is limited to Rewards and Incentives workflow and the API calls covered as part of this experienceList of scenarios where the messages are fired and what they shall be updated to - under analysis and definition. UX Design: Questions:
+
+Out of Scope:
+TBD
+
+Success Criteria:
+& Metrics: Reduction in number of queries / support tickets around """"Where is my Gift card?"""", """":Why have I not received my Gift card?"""" etc. which forms significant % pf support ticketsIncreased member satisfaction scores
+
+Non-Functional Requirements:
+Reference: Feature review with business: Meeting Recoding: 11/24/2025 - Binit, Abhishek, Shikha and Phalguni : Rewards History - Feature review-20251124_083446-Meeting Recording.mp4
+
+Dependencies:
+
+Integration Testing:
+Require ? Architectural Considerations: Supporting links: Rewards Drawer.docx ----
+
+Notes:
+Nottingham - 60 - UI + BFF - implementation for only 1 module Pathway",,,IO Incentives MAH PLSS_Cross_Platform Rewards TechWriting UXD,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,,,,F235140
+FEATURE-F236144,16479734,Feature,Apply Vibrancy Standard to All MAH ApigeeX Proxies,"Business ProblemThe current MAH ApigeeX proxies do not conform to the Vibrancy standard, requiring an update to meet this standard.OutcomeThe Vibrancy standard is successfully applied across all identified MAH ApigeeX proxies, and all changes are validated.In ScopeCoordination with the APIGEE-x core team to estimate the scope of work.Analysis and update of UI codebase on any impacted pages or components.Update of all 24 MAH ApigeeX proxies to apply the Vibrancy standard:- mah-badges-tiers-v1- mah-challenge-v1- mah-clinicalgoal-v1- mah-coaching-v1- mah-common-v1- mah-comunications-v1- mah-deviceintegration-v1- mah-healthriskassessment-v1- mah-homework-v1- mah-journey-v1- mah-login-v1- mah-member-v1- mah-mentalhealth-v1- mah-myhealthscore-v1- mah-notification-v1- mah-otp-v1- mah-personalhealthrecord-v1- mah-registration-v1- mah-rewards-v1- mah-rpc-v1- mah-secure-message-v1- mah-sso-v1- mah-support-v1- mah-trackers-v1Validation of all applied changes to the proxies and any updated UI components.Out of ScopeNone identified.Risks / DependenciesCoordination and estimation with the APIGEE-x core team is required to define the scope and proceed with the work.Success SignalAll 24 listed MAH ApigeeX proxies have the Vibrancy standard successfully applied.All changes are validated to ensure proper functionality and adherence to the standard.Any UI components or pages impacted by the proxy updates are functioning correctly after analysis and updates.",,,MAH,Program,,0.0,,,,1f6f9110-b1fe-49ea-9d9b-af94bef0bb15,11/1/26 0:00,,,F236144
+FEATURE-F228023,16479971,Feature,Onboard Communications Database to the Platform,,Backlog,,PLSS_Cross_Platform,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,,,,F228023
+FEATURE-F228021,16479970,Feature,Multi Query combination support on AgentADE for MMAH (GCP Databases),"Business Value:
+Agent Assist tool will empower L1 team with real time insights for member inquiry by accessing backend data and significantly decreasing the number of ticket handoffs to specialized and expensive L2 teams. L1 team will spend less time searching for information or wait for backend support to check the same in ODS. The tool surfaces relevant information for all the 4 schemas instantly from trained set of queries, improving operational efficiency, First call resolution(FCR) and MTTR.",Backlog,,2026 PLSS_Cross_Platform,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,,,,F228021
+FEATURE-F235813,16479966,Feature,"MAH, Medquery, LCC metrics on IMT","Participants:
+Soumya, Ravi, Ray, Ananda, Prakash, Junaid, Shenyan, Lynette, Abhishek, Jeniffer D, Imisa, Rohith, Sridevi, Scott, Jordan, Deepak, Chris V, Sundar, Arun, Mrudala, ShankarRTE/DL: Terri Arens
+
+Background:
+The Intelligent Monitoring Tool (IMT) is a multi-product platform used by the Business Operations monitoring team to track 12 product lines through real-time Day-over-Day monitoring of member lives in a program and ensure business flow completed end to end for every client. It runs backend queries, populates unified user interface, and triggers configurable threshold-based alerts at three severity levels - so monitors see issues the moment they cross business thresholds. The goal is to reduce monitoring time by 30% while onboarding seven additional products onto the monitoring team - without adding headcount.
+
+Business Value:
+Onboard MAH, LCC, and MedQuery to the Intelligent Monitoring Tool (IMT) to deliver a single, real-time, business-KPI view of program health across the member journey - ingestion -> member match -> engagement -> egress -> outcomes - enabling proactive issue detection where traditional observability or application monitoring stops at system health.Operational efficiency: Reduce manual monitoring effort (currently 2.5-3 hrs/analyst); enable 1 analyst to cover all 3 programs in the same window.Proactive detection: Day-over-Day, Week-over-Week, Month-over-Month threshold alerting replaces reactive triage with early warning on ingestion gaps, member-match shortfalls, engagement dips, and outcome trend shifts.Welcome Season readiness: Validates client/member flow, eligibility, entitlement, and program activation end-to-end before campaigns go live.Business KPI lens: """"Observability detects system failures. IMT detects business failures - even when systems look healthy.""""
+
+In Scope:
+Onboarding the KPI topics from the MAH / MQ / LCC Monitoring Plan to IMT. Only topic categories are listed here, topics are Cross-Program (MAH + LCC + MedQuery) Data Integrity - Vendor/client claim feeds, client enrollment, member entitlement, covered lives, client implementations, variant setup, effective/expiration dates. Member Match - Members by marker, members by condition, entitled members compared to EPIC (clinical system) outreach.EDI / Egress - SFMC email, SFMC text, Surescripts (prescriber), and Arana (print vendor) member counts by program and client.Outcomes - Count of members by open/closed GAP indicator by client (cross-program signal monitoring).Product teams (MAH, LCC, MedQuery) build their own queries / SQL and deliver outputs to IMT; IMT is the platform enabler.MAH-Specific TopicsData Integrity / Welcome Letters - Welcome Letters vs. entitlement, monthly Welcome Letter percent change.Engagement - Engaged (registered) members by client; entitled vs. engaged % by client. EDI / Egress - Egressed incentive files to clients.Outcomes - Incentives by client and by campaign.LCC-Specific TopicsMember Match - Members by AHI (Active Health Index, stratified H/M/L) by client.Engagement - Entitled / Reached / Not Reached and % Reached by client; member counts by appointment status; % appointments completed by client.EDI / Egress - Medica entitlement data by condition (and tobacco).MedQuery-Specific TopicsMember Match - Members by GAP stratification (Severity 1, 2, 3) by client.Engagement / Care Gaps - Members by Care GAPs identified (total and by client); % reminders for open GAPs (vs. 30/60/90-day trigger reports).Outcomes - Missing disposition data (""""unknown outcome"""") by vendor, client, and GAP / Care Consideration.CTP / ECHO platform - IMT tracks key metrics tracked by CTP and ECHO.
+
+Out of Scope:
+# Members in TMV (MML_011) - Descoped per 6/8 confirmation; not used for billing. DataMart / reporting-layer monitoring - IMT sources as close to system of record as possible; not a replacement for aggregated DataMart reporting.Historical data persistence inside IMT - Month-over-month snapshots must be persisted upstream by source/DDAT teams.Member-level case management / remediation - Case-level resolution remains in Care Engine, EPIC, and downstream tools.UX analytics / system observability tooling - Amplitude, Splunk, and similar remain separate; IMT focuses on business KPIs.Drill-down visualizations - Per 6/22 workshop, drill-down views are not KPIs and will not be tracked as measurable metrics.Success Criteria and Metrics Delivery All in-scope KPI topics (Data Integrity, Member Match, Engagement, EDI/Egress, Outcomes) onboarded across MAH, LCC, MedQuery by 7/30/2026. Requirements lock by 7/6/2026; no scope change without formal CR thereafter. 100% of in-scope KPIs traceable from Monitoring Plan -> BRD -> IMT configuration with documented source, frequency, threshold, owner. Engineering build complete with QA query validation green before UAT promotion. Adoption & Operational 1 monitoring analyst able to cover all 3 programs within the 2.5-3 hr daily window. Manual GCP-query / Excel / VLOOKUP effort for daily monitoring reduced by ≥ 70%. ≥ 90% of business KPI questions answered via IMT (dashboards + IMT ADE) without ad-hoc analyst pulls. Quality & Accuracy Maroon-level alert false-positive rate < 5% after 30-day tuning. Business Outcomes Welcome Season: 100% of expected clients/members validated end-to-end (ingest -> match -> outreach -> engagement) via IMT before campaigns go live. Mean Time to Detect upstream feed failures reduced from """"next-day discovery"""" to within the SOB window. Member match rates and care gap identification trends visible Day-1 with DoD / WoW / MoM cadence.
+
+Assumptions:
+MVP delivery is the target for the 8/30/2026 go-live; enhancements continue iteratively post-go-live. ----
+
+Notes:
+MAH, MQ, LCC_Monitoring Plan_2026.xlsx BRD FRD and Design_ MedQuery MyAHM LCC.docx MAH Priority Metrics provided by Rohith - Monitoring IDWho to get data (col C)Program / ProductKPIThresholdIntent / Business ImpactFrequencyFormulaPriorityMML_002 Shankar Selvam, existingMAH# of clients enrolled (by Product - MAH)±10%To watch # no. of clients enrolled to MAHMonthly""""Current - Prior = changeChange / Prior = %""""HMML_003Shankar Selvam, newMAH# of clients enrolled (by variant)±10%To watch # no. of clients enrolled to MAH by Variants. Ex: Core, CorePHR, Plus, PlusPHR, Achieve, Engage & EliteMonthly""""Current - Prior = changeChange / Prior = %""""HMML_029Shankar Selvam, new # of clients enrolled (by Rewards Type)±20%To watch # of clients with Rewards type. Hearts Vs Dollars VS PointsMonthly""""Current - Prior = changeChange / Prior = %""""HMML_004DM Reporting, existingMAHTotal Eligible population, members entitled (minus the minor dependents) (by client)±20%To watch # no. of members eligible to MAHMonthly""""Current - Prior = changeChange / Prior = %""""HMML_033SFMC, existingMAHTotal Eligible population, outreached through Welcome Email (by client)N/ATo watch # no. of members outreached to MAHMonthly""""Current - Prior = changeChange / Prior = %""""HMML_016??DM Reporting, existingMAHTotal entitled population, members registered and % of entitled (by client)±20%To watch # no. of members registered onto MAHWeekly""""Current - Prior = changeChange / Prior = %""""HMML_039DM Reporting, existingMAHTotal entitled population, members engaged and % of registered (by client)±20%To watch # no. of members engaged with MAH Weekly""""Current - Prior = changeChange / Prior = %""""H Medquery, LCC - TBD",Ask,,CDP CM Comm_Platform DP IO PLSS_Cross_Platform,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,7/1/26 0:00,,,F235813
+FEATURE-F231250,16479764,Feature,AHM-RM:  Q1 Minor Release 26.02.1,"Problem Statement (Who, What, Where, When, Why):
+Q1 Minor Release 26.02.1
+
+Benefit Hypothesis:
+
+Contacts/Dependencies:
+
+In Scope:
+Scope that has passed E2E Testing and identified with Milestone 24.09 Q3 Minor Release - Clinical / MAHM GCP:
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:
+
+Outstanding Questions:
+----
+
+Notes:
+DRAFT Playbook(s)CDP Train:",Backlog,,OPEX PLSS_Cross_Platform,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,4/1/25 0:00,2/11/26 23:59,,F231250
+FEATURE-F232563,16479764,Feature,AHM-RM:  March Release 26.03.1,"Problem Statement (Who, What, Where, When, Why):
+March Release 26.03.1
+
+Benefit Hypothesis:
+
+Contacts/Dependencies:
+
+In Scope:
+Scope that has passed E2E Testing and identified with Milestone 24.09 Q3 Minor Release - Clinical / MAHM GCP:
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:
+
+Outstanding Questions:
+----
+
+Notes:
+DRAFT Playbook(s)CDP Train:",Backlog,,OPEX PLSS_Cross_Platform,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,4/1/25 0:00,3/22/26 23:59,,F232563
+FEATURE-F234039,16479764,Feature,AHM-RM:  April Release 26.04.1,"Problem Statement (Who, What, Where, When, Why):
+April Release 26.04.1
+
+Benefit Hypothesis:
+
+Contacts/Dependencies:
+
+In Scope:
+Scope that has passed E2E Testing and identified with Milestone 24.09 Q3 Minor Release - Clinical / MAHM GCP:
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:
+
+Outstanding Questions:
+----
+
+Notes:
+DRAFT Playbook(s)CDP Train:",,,OPEX PLSS_Cross_Platform,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,4/1/25 0:00,4/22/26 23:59,,F234039
+FEATURE-F235346,16479764,Feature,June Release 26.06.1,"Problem Statement (Who, What, Where, When, Why):
+June Release 26.06.1 Playbook Link : June Release 26.06.1.xlsx
+
+Benefit Hypothesis:
+
+Contacts/Dependencies:
+
+In Scope:
+Scope that has passed E2E Testing and identified with Milestone 24.09 Q3 Minor Release - Clinical / MAHM GCP:
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:
+
+Outstanding Questions:
+----
+
+Notes:
+DRAFT Playbook(s)CDP Train:",,,OPEX PLSS_Cross_Platform,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,6/1/26 0:00,6/21/26 23:59,,F235346
+FEATURE-F236180,16479764,Feature,July Release 26.07.1,"Problem Statement (Who, What, Where, When, Why):
+July Release 26.07.1 Playbook Link : July Release 26.06.1.xlsx
+
+Benefit Hypothesis:
+
+Contacts/Dependencies:
+
+In Scope:
+Scope that has passed E2E Testing and identified with Milestone 24.09 Q3 Minor Release - Clinical / MAHM GCP:
+
+Out of Scope:
+
+Architectural impacts [links to diagrams, specs, API Contract]:
+
+UX/UI Content [link to wire frames, sketches, designs, project canvas, customer journey, personas]:
+Engineer:Has Design Review withA11Y elements been completed
+
+Accessibility:
+Runway items to ensure A11Y compliance and testing are considered
+
+API, Endpoints, URL's:
+Provide the impacted components and validate functionality
+
+Use Cases:
+Use case descriptions provide a sequence of step an actor has to go through to achieve a goal and also provide details regarding exception alternative flowsUse Case DescriptionPrimary ActorSummaryPre-ConditionsMain Flow (Success Scenario)Alternate FlowException FlowPost ConditionsBusiness Rules
+
+Assumptions:
+
+Outstanding Questions:
+----
+
+Notes:
+DRAFT Playbook(s)CDP Train:",,,OPEX PLSS_Cross_Platform,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,6/1/26 0:00,7/29/26 23:59,,F236180
+FEATURE-F227073,16479968,Feature,Enabler - Feasibility of IOS runner with POC from Stargate team,"Objective:
+Enable iOS build to happen in GHA.Need and iOS runner to be created in GHA.
+
+Business Value:
+The Centralized Cloud Build triggers are being decommissioned this year. This currently supports our GCP resource creation and is essential for us. Migrating this to GHA will remove our dependency and will empower us to own our terraform pipelines.
+
+In Scope:
+All Git repos that are used for GC
+
+Out of Scope:
+Services deployed in GKE.
+
+Success Criteria and Metrics:
+All resources our maintained with our GHA pipeline instead of Central CB triggers
+
+Assumptions:
+NA
+
+Dependencies:
+Need and iOS runner to be created in GHA.Downstream Integration Testing Required? No",Backlog,,2026,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,3/1/26 0:00,,,F227073
+FEATURE-F228010,16479965,Feature,Post-Cutover Azure Application Support(2026.May),"Objective:
+Support applications restarts and deployments.Support troubleshooting of issues during S&O validation , performance issues in participation with Engg and server teams for any of the applications in any of the Azure Environments as needed after the cut over is complete.",In Progress,,2026,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,5/1/26 0:00,,,F228010
+FEATURE-F228022,16479971,Feature,Multi-agent Multi-node Platform implementation,"Business Value:
+The Multi-Node, Multi-Agent AgentADE Platform delivers significant enterprise-wide value by evolving the current pilot (single-agent architecture) into a scalable, flexible, and secure multi-agent ecosystem. It allows multiple teams to onboard their own agents, reducing duplicate builds and supporting future expansion. Specialized agents and VectorDB optimization deliver faster, more accurate responses, while AD-group-based intent enables seamless multi-system intelligence across products. Configuration-driven onboarding cuts operational overhead, and strong logging enhances governance and observability. The architecture also lays the foundation for future automation, DevOps agents, and CVS-specific AI models.In ScopeCore Platform Components (Phase 1 - Feb Release)Multi-node, multi-agent architecture foundation.Supervisor/Orchestrator agent (intent routing).Agent Registry (metadata for all agents).Natural Language -> SQL agent.Summarization agent integrated with Gemini Flash/Pro.Schema Crawler agent for automated metadata extraction.Configuration Admin UI for:DB connection setupService account setupAD group mappingsUploading contextual documents (DDL, business logic, mapping docs)Data LayerPostgreSQL for configurations, schema metadata.VectorDB for context embeddings, partitioned chunks.Redis for conversation memory / caching.Access & SecurityOAuth + RBAC integration.AD-group-based authorization enforcement.AD-group-driven intent inference.Operational CapabilitiesBackward compatibility with current AgentADE eligibility & incentives use cases-no disruption for existing users.UI surface for enriched, summarized responses.Logging into application DB (summary agent writing logs).ConnectivityMCP server initial setup for agent communication.REST and gRPC pathways defined but minimal implementation in Phase 1.Out of ScopeAgents / Capabilities Not Included in the Initial ReleaseLog Agent integrating with Splunk to query log events.DevOps action agents (deployment automation, server restarts).Plan Notes agent.Enterprise Entitlement agent.Weight Management and IMT deep use cases beyond current pilot scope.System-Level ExclusionsFull conversational multi-turn memory beyond short-term context.Migration to a CVS-owned proprietary LLM.Automated business logic generation from documents (beyond basic ingestion).Cross-application insights that require orchestration of >2 external agents.Governance-Related ActivitiesFull end-to-end AI governance approval for all future agents-handled in later phases.Success Criteria and MetricsFunctional Success MetricsAccuracy: ≥90% correctness rate for NL->SQL queries against supported DBs.Latency: ≤15 seconds response time for standard queries (Vector DB retrieval).Zero disruptions to existing users of the pilot (eligibility, incentives).Schema ingestion success: 100% schema extraction for configured databases.Governance MetricsNo security violations related to AD group enforcement.Successful audit trails for user actions.AssumptionsUsers' AD group membership accurately reflects production data access.Schema crawler can access the target databases with required permissions.Governance approvals for existing pilot are transferable to this platform extension.MCP server support will be sufficient for core agent-to-agent communication.DependenciesTechnical DependenciesOAuth / RBAC infrastructure.AD group configurations in enterprise identity management.Access to PostgreSQL, VectorDB, Redis instances.MCP server availability.Upstream systems providing DB access (GCP, EDP, WM, Onboarding Portal).Organizational DependenciesAI Governance approval for multi-agent orchestration.Integration Testing RequiredThe following integrations require explicit testing:1. AD Group -> Intent -> Access Path ValidationValidate correct routing to each DB based on user's AD group.Validate denial of unauthorized access.2. Orchestrator Agent RoutingTest multi-agent routing scenarios (single agent + multiple agents).Validate correct invocation of NL->SQL agent, summarizer agent.3. MCP Server CommunicationTest agent-to-agent messaging through MCP server for reliability.Validate fallback to gRPC/REST when needed.4. Schema Crawler IntegrationValidate schema extraction across PostgreSQL, BigQuery, EDP sources.Validate storage into PostgreSQL + Vector DB.5. UI + Summarization AgentValidate summarizer receives multi-agent outputs and returns unified responses.Validate logs are written to DB.6. Backward Compatibility TestingEligibility -> No regressionIncentives -> No regression ----
+
+Notes:
+ITPR - ITPR079458",Prepare,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,4/1/26 0:00,,,F228022
+FEATURE-F228032,16479972,Feature,EE - Set up Observability for Compass App (2026.Feb),"No live consumers in prod currently and consumers will onboard after 1/1. There is no API counts. Shares same API link as SuperApp, but with different application name.Buss Value : Visualize API
+
+In Scope:
+Set up Alerts and Dashboa, same as SuperApp , but with different tab.Deliver Business Report
+
+Out of Scope:
+Monitoring in lower environments.",,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,,,,F228032
+FEATURE-F228033,16479972,Feature,EE - Onboard PLP API on Super App,,,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,,,,F228033
+FEATURE-F228037,16479972,Feature,Enabler - Airflow Job Level Monitoring,"Objective:
+Capture and display Job level metrics in observability - POC Needed. Verify if the Airflow metrics can be collected. Airflow metrics is enabled or not. Data Layers are moving across with the help of the jobs. Jobs are created in Airflow, and scheduled in Tidal as it integrates with SNOW. From the airflow multiple metrics will help the team. Scope : Only Production job monitoring.List of Jobs :edp-prod-hcbstorage.edp_hcb_core_cnsvedp-prod-hcbstorage.edp_hcb_entl_core_enredp-prod-storage.edp_ent_entl_cnsedp-prod-storage.edp_ent_core_cnfedp-prod-hcbstorage.edp_hcb_core_enrvedp-prod-storage.edp_ent_entl_cnsvedp-prod-storage.edp_ent_ref_srcedp-prod-storage.edp_ent_coreapi_egredp-prod-storage.edp_ent_coreapi_egrvedp-prod-storage.edp_ent_entlsrc_cnsedp-prod-hcbstorage.edp_hcb_caremgmt_memidedp-prod-pbmstorage.edp_pbm_core_enrvedp-prod-pbmstorage.edp_pbm_entl_enredp-prod-pbmstorage.edp_pbm_core_cnsvedp-prod-hcbstorage.edp_hcb_core_enredp-prod-pbmstorage.edp_pbm_core_cnsv List of Dags : bq_ent_fdr_nextgen_loadbq_ent_fdr_commercial_load_dlybq_ent_api_curated_tables_loadbq_ent_api_mpe_cloudsql_inc_loadbq_ent_api_md_cloudsql_inc_loadbq_program_identifications_loadbq_ent_s19_uniformflex_curated_loadcloud_publishing_frameworkbq_pbm_css_loadbq_ent_pbm_api_curated_tables_load_cryptobq_pbm_ent_api_mpe_cloudsql_inc_loadbq_pbm_ent_api_md_cloudsql_inc_loadbq_ent_reference_load ----
+
+Notes:
+Airflow: Composer name : tra-entl-prod-composercomposer name : edp-prod-eds-entdm-composer-01",,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,3/1/26 0:00,,,F228037
+FEATURE-F228050,16479972,Feature,EE - New Panels post error categorization,"Add more panels for 400 and 500 - 400 and 500 error panels categorization and Query execution timingsWhat all panels can be included for query execution New Panels post Log SterilizationCalculate APi response
+
+Dependency:
+Currently team is doing error categorization which is all coming out as text. Key value pair should be added to the Error code. It includes error and categorization together.",,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,3/1/26 0:00,,,F228050
+FEATURE-F228076,16479966,Feature,IMT- Automation Pilot & Foundation items,"Provide visualization for Week over Week and month over month for Weight management. Automate the manual process of transferring data from the spreadsheet to the dashboard. Currently, two queries are running, and their output is copied into the spreadsheet. The spreadsheet applies conditional rules as follows: Conditional formatting: When Current Lives < 1000, check for a ±10% difference. When Current Lives > 1000, check for a ±5% difference. Conditional formatting for 3E: When Current Lives < 1000, check for a ±10% difference. When Current Lives > 1000, check for a ±5% difference. Check clients whose members have dropped or added (it will be available in the 1f query) (Count of members by client per day. If there is a variance if complete drop or complete new addition. ) Member list that dropped Member list that got added Nice to have for MVP - DOD for top 3 conditions Post-demo (Python version) enhancements for the initial iteration delivered as a POC. Rename below UI Labels “Count of Lives” to “Details” “1F” to “Eligibility” “3E” to “Program Markers” Make these are more prominent in the UI Threshold limit KPI tiles Clients removed Clients added 3E Client count should match with 1F Client count. The Client counts from the SQL Query Result will match. In the Clients Added and Removed Tables, if the count is zero, that needs to be a negative alert. If it is a new client, then the dates before today will be red, and we'll investigate why they just started showing up. If it is a term client, today would show up as null or zero and pop red to let us know we need to go check to make sure this client is really termed.
+
+Assumptions:
+for Initial Iteration Delivered as Proof of Concept (POC) (Python) Conditional Formatting: Current Lives ≥ 1000 is considered instead of > 1000 to include cases where Current Lives equals 1000. Alert Threshold Logic: If the Alert Threshold Limit is set to 10.00, then: Change percentage greater than or Equal to +10% Change percentage less than or Equal to -10% will be highlighted. Single Set of Alert Threshold Limits for Both 1F and 3E: One UI field for setting the Alert Threshold Limit when Current Lives < 1000 One UI field for setting the Alert Threshold Limit when Current Lives ≥ 1000",In Progress,,2026,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,3/1/26 0:00,2/28/26 23:59,,F228076
+FEATURE-F228077,16479966,Feature,IMT Dashboard for Health Advisor,,Ask,,2026,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,,,,F228077
+FEATURE-F228173,16479972,Feature,Health Insights Observability - Alerts/Monitoring for S&O,,Ask,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,2/1/26 0:00,,,F228173
+FEATURE-F229696,16479756,Feature,DevOps Enhancements + Upgrades,"Business Value:
+DevelopersAccess to added functionality.Bug fixesSecurity fixesPerformance enhancementsFaster iterations (Possibility)DevOps EngineersAccess to added functionality.Reduce complexityCustomersSecurity fixesFaster iterations (Possibility)Vendor using applications on compliance
+
+In Scope:
+JenkinsPuppetRundeckArtifactoryMigration to RHEL 8 (If needed)
+
+Out of Scope:
+NA - More tools + process could be added during the PI if justified.
+
+Success Criteria and Metrics:
+Applications run as planned
+
+Assumptions:
+NA
+
+Dependencies:
+NA
+
+Outstanding Questions:
+NA
+
+Sample Use Cases:
+NA Downstream Integration Testing Required? No ----
+
+Notes:
+DevOps ITPR for 2026 : ITPR082136",In Progress,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,4/1/26 0:00,12/31/26 23:59,,F229696
+FEATURE-F229697,16479756,Feature,Puppet AI Agent (2026.Feb),"Objective:
+The overall feature involves upgrading existing Puppet to Puppet Enterprise Advanced to unlock AI capabilities . This AI tool allows natural language interactions with infrastructure for querying, insights and automation without deep puppet expertise.",In Progress,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,4/1/26 0:00,12/31/25 23:59,,F229697
+FEATURE-F232022,16479971,Feature,Onboard Product team Inquiry  Usecases in AgentADE,"Business Value:
+AgentADE is an Agent Assisted Tool will enable product teams to quickly retrieve accurate, real-time answers from the MMAH GCP data sources and internal knowledge repositories without relying on development or L2 support resources. This reduces turnaround time for information requests, accelerates issue resolution, and improves overall issue resolution efficiency. The solution will also empower business users by providing a self-service mechanism to access validated product information, thereby freeing technical teams to focus on higher-value engineering work. Ultimately, this increases productivity, decreases dependency bottlenecks, and improves customer experience through faster, more consistent responses.In ScopeOnboard the tool with use cases for frequently querying product inquiries.Integration with internal databases, APIs, and self-service data sources.Real-time response generation within allowed security guardrails.Logging and audit tracking for all queries and generated responses.Ability to answer common product questions without dev/support team involvement.Aggregated counts at client level, clients with incentive product vs incentive program , clients with pathways etc.Out of ScopeCreation or redesign of backend databases or major product schema changes.Any automated decision-making that impacts production systems.Handling of non-product-related enterprise-wide queries.Integrations with third-party tools not currently used internally.Success Criteria and MetricsReduction in dependency on Development and Support teams:At least 40-60% decrease in routine question requests directed to Dev/Support within the first 90 days.Faster information access:Average response time for product questions reduced from hours/days to seconds/minutes.Accuracy and reliability:95% success rate for responses validated as correct by business teams.Operational efficiency improvement:Reduced backlog of support tickets related to product information requests.
+
+Assumptions:
+Required data sources (databases/APIs) are within MMAH GKE cluster.SMEs will be available to define query rules, mapping, and data validation logic.No significant changes to product architecture will occur during development.Users will adopt the tool when trained and provided adequate onboarding materials.
+
+Integration Testing Required:
+No How many of our current clients have incentive productswhich clients have incentive product but do not have an active incentive programHow many members have completed pathwaysHow many members have completed at least two goals in a pathwayWhat is the average MH100 score of the MAH population for Aetna and AHMWhat is the variant mix for MAH member population How many gift cards have been redeemed so far and what is the dollar value ----
+
+Notes:
+ITPR : production Support transformation ITPR079458 Sample response to be displayed in AgentADEVariantMAH Eligible% of Total MAHIncentive-Eligible% of Incentive PoolElite9,000,00052.60%2,655,54349.80%Achieve1,424,5898.30%1,424,58926.70%Engage980,7135.70%980,71318.40%Plus1,600,0009.30%276,6575.20%Core2,800,00016.40%00.00%Other Variants1,311,3457.70%00.00%TOTAL17,116,647100%5,337,502100%",Backlog,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,3/1/26 0:00,,,F232022
+FEATURE-F233613,16479756,Feature,GCP: Cost Optimization and Alerting,"Objective:
+s:Alert on cost spikes:Focus alerts on service level changesOptimization for GKE scalingHPA scaling on pub/sub depth and other optionsPod scaling configuration optimizationcpu/mem per pod and how many pods in relation to GKE resource optimization",In Progress,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,5/1/26 0:00,,,F233613
+FEATURE-F233733,16479717,Feature,Migrate to Enterprise Cloud Artifactory license,,,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,,,,F233733
+FEATURE-F233734,16479717,Feature,Migrate from jenkins builds to GHA,,,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,,,,F233734
+FEATURE-F233907,16479969,Feature,Enhance GCP deployer tool,Ojbective:Enhance deployer tool features.,In Progress,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,5/1/26 0:00,,,F233907
+FEATURE-F234725,16479969,Feature,Improve Release efficiency,,Prepare,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,,,,F234725
+FEATURE-F234743,16479756,Feature,PLSST Train BAU 2026,Collection for PLSST Train BAU,In Progress,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,5/1/26 0:00,,,F234743
+FEATURE-F234746,16479756,Feature,Security BAU,Bucket for Security and vulnerabilitiesTeams Channel: Snyk VulnerabilitiesServerless Critical Vulnerabilities - Wiz LinkServerless EOL Vulnerabilities - Wiz LinkAHM findings - https://app.wiz.io/findings/vulnerability-findings#%7E%28filters%7E%28cloudAccount%7E%28equals%7E%28%7E%27ahm-sandbox-pophealth%7E%27ahm-dev-pophealth%7E%27ahm-uat-pophealth%7E%27ahm-prod-pophealth%7E%27ahm-qa-pophealth%29%29%7EhasExploit%7E%28equals%7Etrue%29%29%7EgroupBy%7E%28%7E%29%29 Qualys Vulnerabilities Wiz link: https://app.wiz.io/issues#%7E%28filters%7E%28status%7E%28equals%7E%28%7E%27OPEN%7E%27IN_PROGRESS%29%29%7EcloudAccount%7E%28equals%7E%28%7E%272ca01bf6-bc71-56b8-a1e8-0c031bfcfce2%7E%272d2d4b84-687c-5301-b0fd-e4459b12d086%7E%273a168f66-81fa-5dac-85f8-f7b4eeb95cce%7E%27b499058e-656f-5e6b-8390-bc10eefd34f5%7E%27bb129251-66a7-59a9-875f-45d1eb6c020b%29%29%29%29,In Progress,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,5/1/26 0:00,,,F234746
+FEATURE-F235984,16479756,Feature,Transfer Oracle Client installation to DBAs,"Objective:
+Bring all oracle client servers up to standardInstall Oracle Client using the organization standard processSwitch application to new installationRemove old setup",Ask,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,7/1/26 0:00,,,F235984
+FEATURE-F236212,16479969,Feature,Automate Certificate renewals,"Objective:
+Automate Certificate renewals to be 1 button click at mostImplementation plan:Venify renews CERTS automatically and pushes them to puppet serverPuppet classification for appllicaitons includes pulling the CERT from puppet server and putting it on the app serversWindows servers also include binding for applicationsApp restarts would be taken care of by jenkins pipelines or triggered by puppet",Ready,,,Program,,0.0,,,,5c3aedd6-025d-4cd2-9d81-ec00954b3c42,7/1/26 0:00,,,F236212

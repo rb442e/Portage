@@ -1,0 +1,9 @@
+fastapi>=0.110
+uvicorn[standard]>=0.27
+requests>=2.31
+pandas>=2.0
+pyyaml>=6.0
+python-multipart>=0.0.9
+pydantic>=2.6
+truststore>=0.9; python_version >= "3.10"
+cryptography>=42

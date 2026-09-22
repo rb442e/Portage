@@ -1,0 +1,3 @@
+﻿Issue Id,Parent Id,Issue Type,Summary,Description,Status,Priority,Labels,Components,Sprint,Story Points,Assignee,Reporter,Fix Version/s,Team,Start Date,Due Date,Issue Links,Rally ID,Milestones,Created,Severity,Environment,RCA,Root Cause,State,Link,Original Estimate,Epic ID,Epic Name,Parent,Schedule State
+DE1,,Task,Login bug,,Open,High attention,,,,,,,,,2026-06-01,,,DE1,,,Major,PROD,,Code,Open,,,,,,
+F1,,Task,Payments,,In Progress,,,,,8.0,,,,,,,,F1,,,,,,,In Progress,,8,Epic E5: Billing,Epic E5: Billing,,In Progress

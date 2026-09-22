@@ -1,0 +1,16 @@
+services:
+  portage:
+    build: ./backend
+    image: portage-backend:0.1
+    environment:
+      PORTAGE_DATA_DIR: /data
+      PORTAGE_FRONTEND_DIST: /app/frontend_dist
+      PORTAGE_CORS_ORIGINS: "*"
+    volumes:
+      - portage_data:/data
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+volumes:
+  portage_data:

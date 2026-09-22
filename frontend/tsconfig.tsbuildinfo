@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/api.ts","./src/main.tsx","./src/store.tsx","./src/types.ts","./src/pages/attachments.tsx","./src/pages/connections.tsx","./src/pages/dashboard.tsx","./src/pages/exports.tsx","./src/pages/lookups.tsx","./src/pages/mappingcanvas.tsx","./src/pages/mappingstudio.tsx","./src/pages/migrate.tsx","./src/pages/reports.tsx"],"version":"5.9.3"}
