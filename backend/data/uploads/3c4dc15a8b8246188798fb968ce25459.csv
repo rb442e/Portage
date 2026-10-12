@@ -1,3 +1,0 @@
-Issue Type,Formatted ID,Name,Priority,Severity,Resolution,State,Environment,Opened Date,Parent,Refined Estimate,Parent Epic
-Defect,DE1,Login bug,High attention,Major,Code,Open,PROD,06/01/2026,US1,,
-Feature,F1,Payments,,,,In Progress,,,,8,Epic E5: Billing

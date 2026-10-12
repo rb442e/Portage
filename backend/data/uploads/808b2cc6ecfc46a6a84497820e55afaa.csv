@@ -1,3 +1,0 @@
-Formatted ID,Name,Description,Issue Type,Owner,Severity,Iteration Name,Tags,Parent
-F1,Payments Epic,Business Value: x,Feature,jane@corp.com,High,2026.S1,"billing, api",
-US1,Add card form,As a user...,User Story,bob@corp.com,Normal,2026.S1,frontend,F1
