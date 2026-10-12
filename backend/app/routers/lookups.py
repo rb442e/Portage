@@ -15,6 +15,7 @@ from fastapi import APIRouter, Form, HTTPException, UploadFile
 
 from .. import store
 from ..schemas import LOOKUP_KINDS, LookupCsvPreview, LookupTable
+from ..versioning import diff_entries
 
 router = APIRouter(prefix="/api/lookups", tags=["lookups"])
 
@@ -85,6 +86,35 @@ def save_lookup(lookup: LookupTable) -> LookupTable:
 def delete_lookup(lookup_id: int) -> dict:
     store.delete_lookup(lookup_id)
     return {"deleted": lookup_id}
+
+
+@router.get("/{lookup_id}/versions")
+def lookup_versions(lookup_id: int) -> List[dict]:
+    return store.list_versions("lookup", lookup_id)
+
+
+@router.get("/{lookup_id}/diff")
+def lookup_diff(lookup_id: int, from_version: int, to_version: Optional[int] = None) -> dict:
+    """Diff two versions; `to_version` omitted means the latest."""
+    versions = store.list_versions("lookup", lookup_id)
+    if not versions:
+        raise HTTPException(status_code=404, detail="No versions recorded for this catalog")
+    to_v = to_version or versions[0]["version"]
+    a, b = store.get_version("lookup", lookup_id, from_version), store.get_version("lookup", lookup_id, to_v)
+    if not a or not b:
+        raise HTTPException(status_code=404, detail="Version not found")
+    return {"from_version": from_version, "to_version": to_v,
+            **diff_entries(a["payload"].get("entries", {}), b["payload"].get("entries", {}))}
+
+
+@router.post("/{lookup_id}/restore/{version}", response_model=LookupTable)
+def restore_lookup(lookup_id: int, version: int) -> LookupTable:
+    snap = store.get_version("lookup", lookup_id, version)
+    if not snap:
+        raise HTTPException(status_code=404, detail="Version not found")
+    saved = store.save_lookup({**snap["payload"], "id": lookup_id}, author="user",
+                              message=f"Restored v{version}")
+    return LookupTable(**saved)
 
 
 @router.post("/parse", response_model=LookupCsvPreview)

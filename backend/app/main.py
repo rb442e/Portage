@@ -11,8 +11,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from . import __version__, store
 from .config import settings
-from .routers import (attachments, connections, lookups, mappings, migrations,
-                      sources, tools)
+from .routers import (attachments, connections, copilot, lookups, mappings,
+                      migrations, sources, tools)
 
 app = FastAPI(title="Portage", version=__version__,
               description="Carry your work across, intact — ALM migration platform.")
@@ -32,11 +32,14 @@ app.include_router(lookups.router)
 app.include_router(migrations.router)
 app.include_router(attachments.router)
 app.include_router(tools.router)
+app.include_router(copilot.router)
 
 
 @app.on_event("startup")
 def _startup() -> None:
     store.init_db()
+    from .copilot import knowledge
+    knowledge.rebuild()
 
 
 @app.get("/api/health")

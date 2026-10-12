@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { api } from "../api";
+import { useCopilotPage, useDataChanged } from "../copilot/CopilotContext";
 import type { CatalogField, FieldMap, GeneratedCode, MappingCatalog, MappingTemplate, ValueMap } from "../types";
 
 type Conn = { source: string; target: string };
@@ -36,6 +37,13 @@ export default function MappingStudio() {
   const [status, setStatus] = useState("");
   const [code, setCode] = useState<GeneratedCode | null>(null);
   const valueMapsRef = useRef<ValueMap[]>([]);
+
+  useCopilotPage({ mapping_id: templateId ?? undefined, artifact });
+  // A copilot edit is saved as a new version; list it without disturbing the canvas.
+  useDataChanged(["mapping"], (r) => {
+    api.listMappings().then(setSaved).catch(() => {});
+    setStatus(r.name ? `Copilot saved ${r.name}. Select it in the dropdown to open it.` : "Copilot saved a new mapping version.");
+  });
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const portRefs = useRef<Record<string, HTMLElement | null>>({});

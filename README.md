@@ -37,9 +37,10 @@ built specifically for **migrations**.
 ## Run it locally
 
 ### 1. Backend
+Requires Python 3.11+ (the Docker image uses 3.12).
 ```bash
 cd portage/backend
-python3 -m venv .venv && source .venv/bin/activate
+python3.12 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
@@ -66,6 +67,22 @@ Open http://localhost:5173 (Vite proxies `/api` to the backend on :8000).
 4. **Preview** — review the dry run: counts by type, warnings, planned items.
 5. **Migrate** — create the items live and watch progress + the live log.
 6. **Reports** — revisit any past run's full result table.
+
+## Sora, the Portage assistant
+<img src="frontend/public/sora.svg" alt="Sora" width="56" align="right" />
+
+An in-app assistant (the **Ask Sora** button, or `Ctrl/Cmd+K`) that takes plain-English requests such as
+"map Rally Iteration to the Jira sprint field for User Story" or "add Sprint 24 (1042) to the
+sprint catalog". It runs on a **local Ollama model** (default `llama3.1:8b`), so nothing leaves your machine.
+```bash
+ollama pull llama3.1:8b      # once; then keep `ollama serve` running
+```
+- **Propose, then approve:** every change appears as a diff card and is applied only when you click **Apply**.
+  Mapping edits are saved as a new `jira_<artifact>_mapping_vN`; catalog edits are versioned (Jira Catalog → History).
+- **Redaction on by default:** emails and secrets are masked before reaching the model (⚙ in the panel to change).
+- **Skills:** `@mapping`, `@catalog`, `@migration`, `@guide`. Modes, model and URL are configurable in ⚙
+  or via `PORTAGE_OLLAMA_URL`, `PORTAGE_COPILOT_MODEL`, `PORTAGE_COPILOT_MODE`.
+- Tests: `cd backend && pip install pytest httpx && pytest tests` (add `PORTAGE_LIVE_LLM=1` to also run the checks against your local Ollama model).
 
 ## Two input paths
 - **Converted export (fast path):** feed the `jira_all_issues.csv` your existing,

@@ -3,7 +3,7 @@ import type {
   JobStatus, LegacyImportResult, LookupCsvPreview, LookupTable, MappingCatalog, MappingTemplate,
   PreviewResult, RallyConnection, SourcePreview, BatchUploadResult, BatchFileItem, ExportRecord, ExportPreview,
   MappingValidation, AttachmentIdsResult, AttachmentJob, AttachmentRunRequest, ParentMapResult, SplitResult,
-  CopyDescriptionResult, CopyDescIdsResult, CopyDescJob, SavedConnectionState,
+  CopyDescriptionResult, CopyDescIdsResult, CopyDescJob, SavedConnectionState, LookupVersion, EntryDiff,
 } from "./types";
 
 const BASE = "/api";
@@ -137,6 +137,9 @@ export const api = {
   saveLookup: (lk: LookupTable) =>
     req<LookupTable>("/lookups", { method: "POST", body: JSON.stringify(lk) }),
   deleteLookup: (id: number) => req<any>(`/lookups/${id}`, { method: "DELETE" }),
+  lookupVersions: (id: number) => req<LookupVersion[]>(`/lookups/${id}/versions`),
+  lookupDiff: (id: number, fromVersion: number) => req<EntryDiff>(`/lookups/${id}/diff?from_version=${fromVersion}`),
+  restoreLookup: (id: number, version: number) => req<LookupTable>(`/lookups/${id}/restore/${version}`, { method: "POST" }),
   parseLookupCsv: async (file: File, kind: string) => {
     const form = new FormData();
     form.append("file", file);

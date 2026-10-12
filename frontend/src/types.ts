@@ -104,6 +104,15 @@ export interface LookupTable {
   side?: string;
   entries: Record<string, string>;
 }
+export interface LookupVersion { version: number; author: string; message: string; created_at: string; size: number; }
+export interface EntryDiff {
+  added: Record<string, string>;
+  removed: Record<string, string>;
+  changed: Record<string, { from: string; to: string }>;
+  summary: string;
+  from_version?: number;
+  to_version?: number;
+}
 export interface LookupCsvPreview {
   columns: string[];
   sample: Record<string, any>[];

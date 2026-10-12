@@ -16,6 +16,7 @@ from ..engine.mapping import (ARTIFACT_TYPES, CANONICAL_FIELD_DEFS,
                               DEFAULT_JIRA_ALL_TEMPLATE)
 from ..schemas import (CanonicalFieldDef, GeneratedCode, LegacyImportResult,
                        MappingTemplate)
+from ..versioning import diff_mappings
 
 router = APIRouter(prefix="/api/mappings", tags=["mappings"])
 
@@ -92,6 +93,15 @@ def get_template(mapping_id: int) -> MappingTemplate:
     if not data:
         raise HTTPException(status_code=404, detail="Mapping not found")
     return MappingTemplate(**data)
+
+
+@router.get("/{mapping_id}/diff/{other_id}")
+def diff_templates(mapping_id: int, other_id: int) -> dict:
+    """Compare two saved mapping versions (each `Save as new version` is its own row)."""
+    a, b = store.get_mapping(mapping_id), store.get_mapping(other_id)
+    if not a or not b:
+        raise HTTPException(status_code=404, detail="Mapping not found")
+    return {"from": a["name"], "to": b["name"], **diff_mappings(a, b)}
 
 
 @router.delete("/{mapping_id}")

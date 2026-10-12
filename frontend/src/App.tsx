@@ -11,6 +11,9 @@ import Reports from "./pages/Reports";
 import Exports from "./pages/Exports";
 import SplitFile from "./pages/SplitFile";
 import CopyDescription from "./pages/CopyDescription";
+import CopilotDrawer from "./copilot/CopilotDrawer";
+import SoraIcon from "./copilot/SoraIcon";
+import { useCopilot } from "./copilot/CopilotContext";
 
 const s = { fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
 const NavIcon = {
@@ -49,6 +52,7 @@ function StatusPill({ label, ok }: { label: string; ok: boolean }) {
 
 export default function App() {
   const { jiraVerified, rallyVerified } = useApp();
+  const { open, setOpen } = useCopilot();
   return (
     <div className="app">
       <aside className="sidebar">
@@ -77,6 +81,9 @@ export default function App() {
           <div className="row" style={{ gap: 18 }}>
             <StatusPill label="Rally source" ok={rallyVerified} />
             <StatusPill label="Jira target" ok={jiraVerified} />
+            <button className={`cp-ask ${open ? "on" : ""}`} onClick={() => setOpen(!open)} title="Ask Sora (Ctrl/Cmd+K)" aria-label="Ask Sora">
+              <SoraIcon size={22} /> Ask Sora
+            </button>
           </div>
         </header>
         <div className="content">
@@ -94,6 +101,7 @@ export default function App() {
           </Routes>
         </div>
       </div>
+      <CopilotDrawer />
     </div>
   );
 }

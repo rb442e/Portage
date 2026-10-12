@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { api } from "../api";
+import LookupHistory from "../components/LookupHistory";
+import { useCopilotPage, useDataChanged } from "../copilot/CopilotContext";
 import type { LookupCsvPreview, LookupKind, LookupTable } from "../types";
 
 interface Row { source: string; target: string; }
@@ -51,8 +53,13 @@ export default function Lookups() {
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const meta = KINDS.find((k) => k.kind === kind)!;
+
+  useCopilotPage({ lookup_kind: kind });
+  // Reload after the copilot changes a catalog, unless the user has unsaved edits.
+  useDataChanged(["lookups"], () => { refreshCounts(); if (!dirty) load(kind); else setStatus("The copilot changed this catalog. Save or discard your edits, then reload."); });
 
   useEffect(() => { load(kind); }, [kind]);  // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { refreshCounts(); }, []);
@@ -162,6 +169,7 @@ export default function Lookups() {
             </div>
             <div className="jc-actions">
               <button className="jc-btn" onClick={() => setImportOpen(true)}><IconImport /> Import CSV</button>
+              {table?.id && <button className="jc-btn" onClick={() => setHistoryOpen(true)}>History</button>}
               <button className="jc-btn primary" onClick={save} disabled={busy}>{busy ? "Saving…" : "Save"}</button>
             </div>
           </div>
@@ -223,6 +231,10 @@ export default function Lookups() {
       </div>
 
       {importOpen && <ImportModal kind={kind} meta={meta} onClose={() => setImportOpen(false)} onImported={onImported} />}
+      {historyOpen && table?.id && (
+        <LookupHistory lookupId={table.id} label={meta.label} onClose={() => setHistoryOpen(false)}
+          onRestored={() => { load(kind); refreshCounts(); setStatus("Catalog restored"); }} />
+      )}
     </div>
   );
 }

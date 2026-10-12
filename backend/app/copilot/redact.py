@@ -1,0 +1,79 @@
+"""Reversible PII redaction for text sent to the model.
+
+Emails become stable placeholders (<email_1>) and are restored in anything the
+model sends back (tool arguments, streamed answers). Secrets are masked one-way.
+Names are not detectable by pattern, so they are not redacted.
+"""
+from __future__ import annotations
+
+import re
+from typing import Any, Dict
+
+_EMAIL = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")
+_SECRET = re.compile(r"(ATATT[A-Za-z0-9_\-=]{20,}|(?i:api[_-]?key|token|secret|password)\s*[:=]\s*\S+)")
+_PLACEHOLDER = re.compile(r"<email_(\d+)>")
+
+
+class Redactor:
+    def __init__(self, enabled: bool = True) -> None:
+        self.enabled = enabled
+        self._fwd: Dict[str, str] = {}
+        self._rev: Dict[str, str] = {}
+
+    def _email(self, m: "re.Match[str]") -> str:
+        real = m.group(0)
+        key = real.lower()
+        if key not in self._fwd:
+            token = f"<email_{len(self._fwd) + 1}>"
+            self._fwd[key] = token
+            self._rev[token] = real
+        return self._fwd[key]
+
+    def to_model(self, text: str) -> str:
+        if not self.enabled or not text:
+            return text
+        return _EMAIL.sub(self._email, _SECRET.sub("<redacted_secret>", text))
+
+    def from_model(self, text: str) -> str:
+        if not self.enabled or not text or not self._rev:
+            return text
+        return _PLACEHOLDER.sub(lambda m: self._rev.get(m.group(0), m.group(0)), text)
+
+    def obj_to_model(self, obj: Any) -> Any:
+        return self._walk(obj, self.to_model)
+
+    def obj_from_model(self, obj: Any) -> Any:
+        return self._walk(obj, self.from_model)
+
+    def _walk(self, obj: Any, fn) -> Any:
+        if isinstance(obj, str):
+            return fn(obj)
+        if isinstance(obj, list):
+            return [self._walk(x, fn) for x in obj]
+        if isinstance(obj, dict):
+            return {fn(k) if isinstance(k, str) else k: self._walk(v, fn) for k, v in obj.items()}
+        return obj
+
+    def stream(self) -> "StreamRestorer":
+        return StreamRestorer(self)
+
+
+class StreamRestorer:
+    """Restores placeholders in streamed tokens, holding back a possible partial `<email_N>`."""
+
+    def __init__(self, red: Redactor) -> None:
+        self._red = red
+        self._buf = ""
+
+    def feed(self, chunk: str) -> str:
+        self._buf += chunk
+        cut = self._buf.rfind("<")
+        if cut != -1 and ">" not in self._buf[cut:] and len(self._buf) - cut <= 12:
+            ready, self._buf = self._buf[:cut], self._buf[cut:]
+        else:
+            ready, self._buf = self._buf, ""
+        return self._red.from_model(ready)
+
+    def flush(self) -> str:
+        ready, self._buf = self._buf, ""
+        return self._red.from_model(ready)
