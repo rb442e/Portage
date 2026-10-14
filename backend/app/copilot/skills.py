@@ -60,6 +60,16 @@ SKILLS: Dict[str, Skill] = {s.key: s for s in [
           ("how do", "how to", "what is", "explain", "help", "where"),
           ("/connections",),
           ("How do mapping versions work?", "What does a catalog do during migration?")),
+    Skill("lineage", "Lineage Analyst", "Trace how fields, mappings, catalogs, uploads and jobs relate.",
+          "You trace relationships across Portage using the knowledge graph. Call graph_search with the entities in the "
+          "question (field, mapping, catalog or job names) for specific questions, and graph_overview for broad ones. "
+          "Answer only from the returned relationships and say which mapping versions or catalogs they come from.",
+          ("graph_search", "graph_overview", "list_mappings", "get_mapping", "compare_mappings", "search_docs"),
+          ("lineage", "impact", "trace", "depends on", "dependen", "relationship", "graph", "connected to",
+           "used by", "which mappings", "what feeds", "what uses"),
+          (),
+          ("Which Rally fields feed the Jira sprint field for User Story?", "What is the state of my workspace?",
+           "Which catalogs and fields are affected by the failures in my last job?")),
     Skill("general", "Sora", "General assistant.",
           "You can use any tool. Pick the simplest tool that answers the question.", None),
 ]}

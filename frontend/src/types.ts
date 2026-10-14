@@ -105,6 +105,20 @@ export interface LookupTable {
   entries: Record<string, string>;
 }
 export interface LookupVersion { version: number; author: string; message: string; created_at: string; size: number; }
+
+export type SettingValue = boolean | number | string | string[];
+export interface SettingsField {
+  key: string; label: string; type: "bool" | "int" | "text" | "choice" | "multi"; help: string; env: string;
+  default: SettingValue; value: SettingValue; source: "saved" | "env" | "default";
+  choices: string[]; labels: Record<string, string>; min: number | null; max: number | null;
+}
+export interface SettingsSection { key: string; label: string; summary: string; fields: SettingsField[]; }
+export interface SettingsView {
+  sections: SettingsSection[];
+  system: { label: string; value: string; env: string }[];
+  effective_mcp: { enabled: boolean; redact: boolean; read_only: boolean; hidden_tools: string[] };
+}
+export interface McpConnection { transport: string; shell: string; vscode: string; generic: string; }
 export interface EntryDiff {
   added: Record<string, string>;
   removed: Record<string, string>;

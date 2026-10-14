@@ -80,9 +80,38 @@ ollama pull llama3.1:8b      # once; then keep `ollama serve` running
 - **Propose, then approve:** every change appears as a diff card and is applied only when you click **Apply**.
   Mapping edits are saved as a new `jira_<artifact>_mapping_vN`; catalog edits are versioned (Jira Catalog → History).
 - **Redaction on by default:** emails and secrets are masked before reaching the model (⚙ in the panel to change).
-- **Skills:** `@mapping`, `@catalog`, `@migration`, `@guide`. Modes, model and URL are configurable in ⚙
+- **Skills:** `@mapping`, `@catalog`, `@migration`, `@guide`, `@lineage`. Modes, model and URL are configurable in ⚙
   or via `PORTAGE_OLLAMA_URL`, `PORTAGE_COPILOT_MODEL`, `PORTAGE_COPILOT_MODE`.
 - Tests: `cd backend && pip install pytest httpx && pytest tests` (add `PORTAGE_LIVE_LLM=1` to also run the checks against your local Ollama model).
+
+### GraphRAG: ask how things relate
+A knowledge graph is built from your own data on every question (no LLM extraction, so it is exact and always current):
+mappings and their versions, Rally → Jira field lineage per artifact, value maps, catalogs with entries and history,
+uploaded columns, jobs and error clusters (linked to the catalogs and fields they mention). `graph_search` finds the
+best-matching items, follows their relationships for a few hops and adds the relevant documentation;
+`graph_overview` summarises the whole workspace. Try `@lineage Which Rally fields feed the sprint field for User Story?`
+or `@lineage Which catalogs are affected by the failures in my last job?`.
+
+### MCP server: let other agents use Portage
+The same governed tool registry is available to any MCP client (VS Code, Claude Desktop, ...) over stdio:
+```bash
+PYTHONPATH=backend PORTAGE_DATA_DIR=backend/data .venv/bin/python -m app.mcp_server
+```
+In VS Code the repo already ships [.vscode/mcp.json](.vscode/mcp.json); start the `portage` server from the MCP list.
+Governance is identical to Sora: read tools run immediately, `propose_*` tools only create a proposal you apply in
+**Ask Sora → History** (there is no apply tool over MCP), read-only mode hides write tools, redaction masks emails
+and secrets, and every call is audited. Requires `mcp>=1.9,<2` (the 2.x SDK changed its server API).
+What MCP clients may do is set under **Settings → MCP server**: switch access off, make it read-only (it is also
+read-only whenever Sora is), hide individual tools, and choose redaction (on by default, independent of Sora).
+The same page shows ready-to-paste client configuration for your installation.
+
+### Settings
+The **Settings** page (sidebar) holds product settings in sections: **Sora assistant**, **MCP server**, **GraphRAG**
+(default depth and answer size) and a read-only **System** view (data directory, database, CORS, version).
+For every setting a saved value wins over an environment variable, which wins over the default; the page shows which
+applies and lets you reset to it. Changes are audited. No secrets are kept here. API: `GET /api/settings`,
+`PUT /api/settings/{section}`, `DELETE /api/settings/{section}[/{key}]`. To add a setting, add a `Field` in
+[backend/app/product_settings.py](backend/app/product_settings.py); the API and page pick it up.
 
 ## Two input paths
 - **Converted export (fast path):** feed the `jira_all_issues.csv` your existing,

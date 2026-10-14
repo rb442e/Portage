@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from . import __version__, store
 from .config import settings
 from .routers import (attachments, connections, copilot, lookups, mappings,
-                      migrations, sources, tools)
+                      migrations, settings as settings_router, sources, tools)
 
 app = FastAPI(title="Portage", version=__version__,
               description="Carry your work across, intact — ALM migration platform.")
@@ -33,6 +33,8 @@ app.include_router(migrations.router)
 app.include_router(attachments.router)
 app.include_router(tools.router)
 app.include_router(copilot.router)
+
+app.include_router(settings_router.router)
 
 
 @app.on_event("startup")

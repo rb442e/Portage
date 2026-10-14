@@ -23,7 +23,7 @@ from ..engine.mapping import ARTIFACT_TYPES
 from ..engine.transform import load_dataframe
 from ..schemas import LOOKUP_KINDS
 from ..versioning import diff_entries, diff_mappings
-from . import knowledge
+from . import graph, knowledge
 
 
 class ToolError(Exception):
@@ -336,6 +336,19 @@ def _search_docs(ctx: ToolContext, a: DocsArgs) -> Dict[str, Any]:
     return {"results": knowledge.search(a.query)}
 
 
+class GraphSearchArgs(BaseModel):
+    query: str = Field(description="Question or entity names, e.g. 'which mappings populate sprint for User Story' or 'why did team values fail'")
+    depth: Optional[int] = Field(default=None, ge=1, le=3, description="Relationship hops to follow; omit to use the configured default")
+
+
+def _graph_search(ctx: ToolContext, a: GraphSearchArgs) -> Dict[str, Any]:
+    return graph.search(a.query, a.depth)
+
+
+def _graph_overview(ctx: ToolContext, a: NoArgs) -> Dict[str, Any]:
+    return graph.overview()
+
+
 def _connection_status(ctx: ToolContext, a: NoArgs) -> Dict[str, Any]:
     row = store.get_setting("connection_profile")
     if not row:
@@ -593,6 +606,10 @@ _r("find_unmapped_values", "Find values in a source file that are missing from t
 _r("list_jobs", "List recent migration jobs.", LimitArgs, _list_jobs)
 _r("get_job", "Show a migration job's results and failures.", JobArgs, _get_job)
 _r("search_docs", "Search Portage documentation and concepts.", DocsArgs, _search_docs)
+_r("graph_search", "GraphRAG over Portage data: finds matching mappings, fields, catalogs, uploads and jobs and follows their relationships (lineage, versions, dependencies, error causes) with linked docs.",
+   GraphSearchArgs, _graph_search)
+_r("graph_overview", "Summarise the whole workspace: mapping versions per artifact, catalogs and their history, job states and top errors.",
+   NoArgs, _graph_overview)
 _r("connection_status", "Show whether Jira/Rally connections are saved (never returns secrets).", NoArgs, _connection_status)
 _w("propose_mapping_edit", "Add, change or remove field mappings for one artifact and save as a new mapping version.",
    MappingEditArgs, _plan_mapping_edit, _apply_mapping_edit)

@@ -4,6 +4,7 @@ import type {
   PreviewResult, RallyConnection, SourcePreview, BatchUploadResult, BatchFileItem, ExportRecord, ExportPreview,
   MappingValidation, AttachmentIdsResult, AttachmentJob, AttachmentRunRequest, ParentMapResult, SplitResult,
   CopyDescriptionResult, CopyDescIdsResult, CopyDescJob, SavedConnectionState, LookupVersion, EntryDiff,
+  SettingsView, SettingValue, McpConnection,
 } from "./types";
 
 const BASE = "/api";
@@ -245,4 +246,10 @@ export const api = {
     req<CopyDescJob>("/tools/copy-description/bulk", { method: "POST", body: JSON.stringify(r) }),
   copyDescJob: (id: string) => req<CopyDescJob>(`/tools/copy-description/jobs/${id}`),
   copyDescReportUrl: (id: string) => `${BASE}/tools/copy-description/jobs/${id}/report.csv`,
+  settings: () => req<SettingsView>("/settings"),
+  saveSettings: (section: string, values: Record<string, SettingValue>) =>
+    req<SettingsView>(`/settings/${section}`, { method: "PUT", body: JSON.stringify({ values }) }),
+  resetSetting: (section: string, key?: string) =>
+    req<SettingsView>(key ? `/settings/${section}/${key}` : `/settings/${section}`, { method: "DELETE" }),
+  mcpConnection: () => req<McpConnection>("/settings/mcp/connection"),
 };
