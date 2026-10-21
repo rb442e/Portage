@@ -4,14 +4,14 @@ from __future__ import annotations
 import json
 from typing import Any, Dict, Iterator, List, Optional
 
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, HTTPException, Request, UploadFile
+from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel
 
-from .. import store
-from ..copilot import settings as cfg_mod
+from .. import auth, store
+from ..copilot import attachments, settings as cfg_mod
 from ..copilot.agent import run_chat
-from ..copilot.llm import OllamaClient
+from ..copilot.llm import OllamaClient, model_installed
 from ..copilot.skills import SKILLS, suggestions_for
 from ..copilot.tools import ToolError, apply_proposal
 
@@ -30,6 +30,7 @@ class ChatRequest(BaseModel):
     message: str
     conversation_id: str = ""
     skill: str = ""
+    attachments: List[str] = []
     page: PageContext = PageContext()
 
 
@@ -40,6 +41,8 @@ class SettingsPatch(BaseModel):
     mode: Optional[str] = None
     redact: Optional[bool] = None
     max_steps: Optional[int] = None
+    vision_model: Optional[str] = None
+    attachment_retention_days: Optional[int] = None
 
 
 def _sse(events: Iterator[Dict[str, Any]]) -> Iterator[str]:
@@ -48,10 +51,14 @@ def _sse(events: Iterator[Dict[str, Any]]) -> Iterator[str]:
 
 
 @router.post("/chat")
-def chat(req: ChatRequest) -> StreamingResponse:
+def chat(req: ChatRequest, request: Request) -> StreamingResponse:
     if not req.message.strip():
         raise HTTPException(status_code=400, detail="Message is empty")
-    events = run_chat(req.message, req.conversation_id, req.page.model_dump(exclude_none=True), req.skill)
+    viewer = auth.current_user(request)["role"] == "viewer"   # viewers can ask Sora but never get change tools
+    user = auth.current_user(request)
+    events = run_chat(req.message, req.conversation_id, req.page.model_dump(exclude_none=True), req.skill,
+                      req.attachments, read_only=viewer,
+                      can_manage_mcp=(not auth.enabled() or user["role"] == "admin"))
     return StreamingResponse(_sse(events), media_type="text/event-stream",
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
@@ -59,7 +66,35 @@ def chat(req: ChatRequest) -> StreamingResponse:
 @router.get("/status")
 def status() -> Dict[str, Any]:
     cfg = cfg_mod.get()
-    return {"settings": cfg, "llm": OllamaClient(cfg["base_url"], cfg["model"]).health()}
+    llm = OllamaClient(cfg["base_url"], cfg["model"]).health()
+    llm["vision_model_available"] = model_installed(llm["models"], cfg["vision_model"])
+    return {"settings": cfg, "llm": llm}
+
+
+@router.post("/attachments")
+async def upload_attachment(file: UploadFile) -> Dict[str, Any]:
+    data = await file.read(attachments.MAX_IMAGE_BYTES + 1)
+    try:
+        meta = attachments.save(file.filename or "attachment", data)
+    except attachments.AttachmentError as e:
+        raise HTTPException(status_code=e.status, detail=str(e))
+    attachments.purge(cfg_mod.get()["attachment_retention_days"])
+    return attachments.public(meta)
+
+
+@router.get("/attachments/{attachment_id}")
+def attachment_image(attachment_id: str) -> Response:
+    meta = attachments.get(attachment_id)
+    if not meta or meta["kind"] != "image":
+        raise HTTPException(status_code=404, detail="Attachment not found")
+    return Response(attachments.read(attachment_id), media_type=meta["mime"],
+                    headers={"X-Content-Type-Options": "nosniff", "Cache-Control": "private, max-age=3600"})
+
+
+@router.delete("/attachments/{attachment_id}")
+def remove_attachment(attachment_id: str) -> Dict[str, str]:
+    attachments.delete(attachment_id)
+    return {"deleted": attachment_id}
 
 
 @router.get("/settings")
@@ -105,7 +140,7 @@ def delete_conversation(conv_id: str) -> Dict[str, str]:
 
 
 @router.post("/proposals/{proposal_id}/apply")
-def apply(proposal_id: str) -> Dict[str, Any]:
+def apply(proposal_id: str, request: Request) -> Dict[str, Any]:
     if cfg_mod.get()["mode"] == "readonly":
         raise HTTPException(status_code=403, detail="Copilot is in read-only mode")
     p = store.get_proposal(proposal_id)
@@ -113,6 +148,12 @@ def apply(proposal_id: str) -> Dict[str, Any]:
         raise HTTPException(status_code=404, detail="Proposal not found")
     if p["status"] != "pending":
         raise HTTPException(status_code=409, detail=f"Proposal already {p['status']}")
+    if p["tool"] == "propose_mcp_server":
+        if auth.enabled() and auth.current_user(request)["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Only an admin can add MCP servers.")
+        from ..copilot import external_mcp
+        if not external_mcp.editing_enabled():
+            raise HTTPException(status_code=403, detail="MCP server editing is disabled in Portage Settings.")
     try:
         result = apply_proposal(p)
     except ToolError as e:

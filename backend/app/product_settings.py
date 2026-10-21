@@ -27,6 +27,14 @@ def _tool_names() -> Tuple[str, ...]:
     return tuple(REGISTRY)
 
 
+def _external_mcp_names() -> Tuple[str, ...]:
+    from .copilot.external_mcp import names
+    try:
+        return tuple(names())
+    except Exception:  # malformed admin config should be reported by the MCP status card, not break Settings
+        return ()
+
+
 @dataclass(frozen=True)
 class Field:
     key: str
@@ -40,6 +48,7 @@ class Field:
     min: Optional[int] = None
     max: Optional[int] = None
     clean: Optional[Callable[[Any], Any]] = None
+    hidden: bool = False           # managed by a dedicated panel instead of the generic form
 
     def options(self) -> Tuple[str, ...]:
         return tuple(self.choices() if callable(self.choices) else self.choices)
@@ -65,8 +74,13 @@ SECTIONS: Tuple[Section, ...] = (
               labels={"propose": "Propose changes (you approve)", "readonly": "Read-only (no changes)"}),
         Field("redact", "Mask emails and secrets", "bool", True, "Masked before text reaches the model."),
         Field("max_steps", "Max steps per turn", "int", 6, "Tool calls Sora may chain in one answer.", min=1, max=12),
+        Field("vision_model", "Vision model", "text", "gemma3:4b",
+              "Reads screenshots you attach; Sora then answers from its description. Install with: ollama pull <model>.",
+              env="PORTAGE_VISION_MODEL"),
+        Field("attachment_retention_days", "Keep attachments (days)", "int", 7,
+              "Files and screenshots attached to chats are deleted after this long.", min=1, max=90),
     ), storage_key="copilot_settings"),
-    Section("mcp", "MCP server", "What external agents may do through the MCP server (python -m app.mcp_server).", (
+    Section("mcp", "MCP server", "Control Portage's MCP server and read-only MCP tools available to Sora.", (
         Field("enabled", "Allow MCP access", "bool", True,
               "Master switch. When off, connected clients see no tools. Takes effect on the next call.",
               env="PORTAGE_MCP_ENABLED"),
@@ -78,6 +92,9 @@ SECTIONS: Tuple[Section, ...] = (
               env="PORTAGE_MCP_REDACT"),
         Field("hidden_tools", "Hidden tools", "multi", (), "Tools MCP clients cannot see or call.",
               env="PORTAGE_MCP_HIDDEN_TOOLS", choices=_tool_names),
+        Field("external_servers", "External servers available to Sora", "multi", (),
+              "Which external MCP servers Sora may use. Managed in the External MCP servers panel. Only tools explicitly marked read-only are exposed to Sora; external write tools are blocked.",
+              env="PORTAGE_MCP_EXTERNAL_SERVERS", choices=_external_mcp_names, hidden=True),
     )),
     Section("graph", "GraphRAG", "How graph_search explores relationships (used by Sora and MCP clients).", (
         Field("default_depth", "Default depth", "int", 2, "Relationship hops followed when the caller gives none.",
@@ -216,7 +233,8 @@ def mcp_policy() -> Dict[str, Any]:
     """Effective MCP behaviour. MCP is never more permissive than Sora."""
     sora, mcp = get("sora"), get("mcp")
     return {"enabled": mcp["enabled"], "redact": mcp["redact"], "hidden_tools": set(mcp["hidden_tools"]),
-            "read_only": mcp["read_only"] or sora["mode"] == "readonly"}
+            "read_only": mcp["read_only"] or sora["mode"] == "readonly",
+            "external_servers": list(mcp["external_servers"])}
 
 
 def describe() -> Dict[str, Any]:
@@ -228,7 +246,8 @@ def describe() -> Dict[str, Any]:
             {"key": f.key, "label": f.label, "type": f.type, "help": f.help, "env": f.env,
              "default": list(f.default) if f.type == "multi" else f.default,
              "value": resolved[f.key][0], "source": resolved[f.key][1],
-             "choices": list(f.options()), "labels": f.labels, "min": f.min, "max": f.max} for f in sec.fields]})
+             "choices": list(f.options()), "labels": f.labels, "min": f.min, "max": f.max,
+             "hidden": f.hidden} for f in sec.fields]})
     return {"sections": sections}
 
 

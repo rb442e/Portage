@@ -1,4 +1,5 @@
 import json
+import pytest
 
 from app import store
 from app.copilot import agent, tools
@@ -15,9 +16,15 @@ def run(name, args):
 def test_redactor_roundtrip_and_stream():
     r = Redactor(True)
     masked = r.to_model("ping a.b@corp.com and A.B@corp.com token=abc123")
-    assert "corp.com" not in masked and "<redacted_secret>" in masked
+    assert "corp.com" not in masked and "<secret_1>" in masked
     assert masked.count("<email_1>") == 2
     assert r.from_model("hi <email_1>") == "hi a.b@corp.com"
+    secret = Redactor(True)
+    credential = "Authorization: Bearer abc123secret"
+    hidden = secret.to_model(credential)
+    assert "abc123secret" not in hidden and secret.from_model(hidden) == "Authorization: Bearer [credential protected]"
+    assert secret.obj_from_model({"value": "Bearer <secret_1>"})["value"] == "Bearer abc123secret"
+    assert "abc123secret" not in secret.safe_to_store(credential)
     s = r.stream()
     out = s.feed("hi <ema") + s.feed("il_1> bye") + s.flush()
     assert out == "hi a.b@corp.com bye"
@@ -163,3 +170,40 @@ def test_docs_search(client):
 def test_schemas_are_flat_for_the_model():
     schema = tools.REGISTRY["propose_mapping_edit"].schema()["function"]["parameters"]
     assert "$ref" not in json.dumps(schema) and "title" not in json.dumps(schema)
+
+
+def test_sora_can_propose_remote_mcp_server_without_persisting_header_secret(client, monkeypatch):
+    from app.copilot import external_mcp
+
+    monkeypatch.setenv(external_mcp.EDIT_FLAG, "1")
+    monkeypatch.setattr(external_mcp, "probe_draft", lambda *a, **k: {
+        "name": "public_docs", "status": "available", "tool_count": 1, "blocked_count": 0,
+        "tools": ["search"], "blocked": []})
+    ctx = ToolContext(conversation_id="mcp-test", can_manage_mcp=True)
+    secret = "Bearer service-secret-value"
+    result, proposal = execute(REGISTRY["propose_mcp_server"], ctx, {
+        "name": "public_docs", "transport": "http", "url": "https://example.com/mcp",
+        "headers": [{"name": "Authorization", "value": secret}], "enable_for_sora": True})
+    assert result["status"] == "proposal_created" and proposal
+    assert secret not in json.dumps(proposal) and secret not in json.dumps(store.list_audit())
+    applied = apply_proposal(proposal)
+    assert applied["refresh"] == ["mcp_servers"]
+    server = next(s for s in external_mcp._all_servers() if s.name == "public_docs")
+    assert server.url == "https://example.com/mcp" and server.env["Authorization"] == secret
+    assert "public_docs" in __import__("app.product_settings", fromlist=["get"]).get("mcp")["external_servers"]
+
+
+@pytest.mark.parametrize("transport,label", [("stdio", "stdio"), ("http", "Streamable HTTP"), ("sse", "SSE")])
+def test_sora_test_mcp_server_reports_transport_without_exposing_config(monkeypatch, transport, label):
+    from app.copilot import external_mcp
+
+    server = external_mcp.ServerConfig("docs", "python", [], {"TOKEN": "private"}, None,
+                                       "ui", "https://example.com/mcp" if transport != "stdio" else None, transport)
+    monkeypatch.setattr(external_mcp, "_all_servers", lambda: [server])
+    monkeypatch.setattr(external_mcp, "names", lambda: ["docs"])
+    monkeypatch.setattr(external_mcp, "probe_saved", lambda name: {
+        "name": name, "status": "available", "tool_count": 1, "blocked_count": 0,
+        "tools": ["search"], "blocked": []})
+    result, proposal = run("test_mcp_server", {"name": "docs"})
+    assert proposal is None and result["transport"] == label
+    assert result["status"] == "available" and "private" not in json.dumps(result)

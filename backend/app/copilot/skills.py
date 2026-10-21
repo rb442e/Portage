@@ -36,8 +36,17 @@ SKILLS: Dict[str, Skill] = {s.key: s for s in [
            "What changed between my last two mapping versions?")),
     Skill("catalog", "Catalog Curator", "Maintain sprint, version, user and team catalogs.",
           "You specialise in the Jira Catalog (sprint, version, user, team). Source = Rally value, target = Jira value. "
-          "To add or change values call propose_catalog_upsert; to undo call list_catalog_versions then "
-          "propose_catalog_restore. Use find_unmapped_values to detect gaps in an uploaded source file.",
+            "When asked to add or change values, call propose_catalog_upsert immediately; do not describe a function call, "
+            "print JSON, or narrate what you plan to call. One entry has exactly 'source' and 'target'; 'note' belongs "
+            "at the top level, not inside entries. For a user catalog, source is the exact user name and target is the "
+            "exact Jira email or accountId. If a spreadsheet or screenshot is attached, read its headers and preserve "
+            "each row and cell exactly: one row becomes one entry. Never concatenate adjacent cells, complete an email, "
+              "or infer unreadable text. If an email is redacted as <email_N>, use that placeholder exactly; the server "
+              "restores the real email in the proposal, so do not ask the user to repeat it. If vision marks a cell [unclear] "
+              "or a value is genuinely missing, ask one short clarification before proposing. "
+            "To undo call list_catalog_versions then propose_catalog_restore. To find sprint, version, user or team "
+            "values in an uploaded Rally CSV that are missing from the catalog, call find_unmapped_values with just the "
+            "kind (no column) and list the missing values it returns with their counts.",
           ("list_catalogs", "get_catalog_entries", "list_catalog_versions", "find_unmapped_values", "distinct_values",
            "list_sources", "describe_source", "propose_catalog_upsert", "propose_catalog_remove",
            "propose_catalog_restore", "search_docs"),
@@ -46,9 +55,10 @@ SKILLS: Dict[str, Skill] = {s.key: s for s in [
           ("Which sprints in my latest upload are missing from the catalog?", "Add Sprint 24 with Jira ID 1042 to the sprint catalog",
            "Undo the last change to the team catalog")),
     Skill("migration", "Migration Operator", "Inspect jobs, failures and readiness.",
-          "You specialise in migration runs. Use list_jobs and get_job to explain results and failures, and "
-          "find_unmapped_values to explain missing catalog values. You cannot start a migration; tell the user to use "
-          "the Migrate page.",
+          "You specialise in migration runs. Use get_job (no arguments for the most recent run, or an id from list_jobs) "
+          "to explain results and failures: lead with how many items failed and the failure_causes, then say what to do. "
+          "Use find_unmapped_values to name the missing catalog values. You cannot start a migration; tell the user to "
+          "use the Migrate page.",
           ("list_jobs", "get_job", "list_sources", "describe_source", "find_unmapped_values", "list_mappings",
            "connection_status", "search_docs"),
           ("job", "migrat", "failed", "error", "dry run", "dry-run", "preview", "export", "attachment", "why did"),
@@ -63,7 +73,9 @@ SKILLS: Dict[str, Skill] = {s.key: s for s in [
     Skill("lineage", "Lineage Analyst", "Trace how fields, mappings, catalogs, uploads and jobs relate.",
           "You trace relationships across Portage using the knowledge graph. Call graph_search with the entities in the "
           "question (field, mapping, catalog or job names) for specific questions, and graph_overview for broad ones. "
-          "Answer only from the returned relationships and say which mapping versions or catalogs they come from.",
+          "Answer only from the returned 'facts' and relationships, in at most four short bullets, naming the mapping "
+          "versions. Rally fields are only the sources of 'feeds' relationships; catalogs translate values and are never "
+          "Rally fields. Do not explain how the graph works.",
           ("graph_search", "graph_overview", "list_mappings", "get_mapping", "compare_mappings", "search_docs"),
           ("lineage", "impact", "trace", "depends on", "dependen", "relationship", "graph", "connected to",
            "used by", "which mappings", "what feeds", "what uses"),

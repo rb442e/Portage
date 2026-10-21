@@ -10,7 +10,7 @@ import re
 from typing import Any, Dict
 
 _EMAIL = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")
-_SECRET = re.compile(r"(ATATT[A-Za-z0-9_\-=]{20,}|(?i:api[_-]?key|token|secret|password)\s*[:=]\s*\S+)")
+_SECRET = re.compile(r"(?i)(authorization\s*[:=]\s*(?:bearer|basic)\s+|(?:api[_-]?key|token|secret|password)\s*[:=]\s*)([^\s,;]+)|\b(ATATT[A-Za-z0-9_\-=]{20,})\b|\b(bearer|basic)\s+([A-Za-z0-9+/_=-]{12,})")
 _PLACEHOLDER = re.compile(r"<email_(\d+)>")
 
 
@@ -19,6 +19,17 @@ class Redactor:
         self.enabled = enabled
         self._fwd: Dict[str, str] = {}
         self._rev: Dict[str, str] = {}
+        self._secret_fwd: Dict[str, str] = {}
+        self._secret_rev: Dict[str, str] = {}
+
+    def _secret(self, m: "re.Match[str]") -> str:
+        secret = m.group(2) or m.group(3) or m.group(5)
+        if secret not in self._secret_fwd:
+            token = f"<secret_{len(self._secret_fwd) + 1}>"
+            self._secret_fwd[secret] = token
+            self._secret_rev[token] = secret
+        prefix = m.group(1) or ((m.group(4) + " ") if m.group(4) else "")
+        return prefix + self._secret_fwd[secret]
 
     def _email(self, m: "re.Match[str]") -> str:
         real = m.group(0)
@@ -30,20 +41,32 @@ class Redactor:
         return self._fwd[key]
 
     def to_model(self, text: str) -> str:
-        if not self.enabled or not text:
+        if not text:
             return text
-        return _EMAIL.sub(self._email, _SECRET.sub("<redacted_secret>", text))
+        text = _SECRET.sub(self._secret, text)
+        return _EMAIL.sub(self._email, text) if self.enabled else text
 
     def from_model(self, text: str) -> str:
-        if not self.enabled or not text or not self._rev:
+        if not text:
             return text
-        return _PLACEHOLDER.sub(lambda m: self._rev.get(m.group(0), m.group(0)), text)
+        text = re.sub(r"<secret_(\d+)>", "[credential protected]", text)
+        return _PLACEHOLDER.sub(lambda m: self._rev.get(m.group(0), m.group(0)), text) if self.enabled else text
+
+    def _tool_from_model(self, text: str) -> str:
+        if not text:
+            return text
+        text = re.sub(r"<secret_(\d+)>", lambda m: self._secret_rev.get(m.group(0), m.group(0)), text)
+        return _PLACEHOLDER.sub(lambda m: self._rev.get(m.group(0), m.group(0)), text) if self.enabled else text
+
+    def safe_to_store(self, text: str) -> str:
+        """Persist messages with credential values masked, without changing existing email handling."""
+        return _SECRET.sub(lambda m: (m.group(1) or ((m.group(4) + " ") if m.group(4) else "")) + "<redacted_secret>", text or "")
 
     def obj_to_model(self, obj: Any) -> Any:
         return self._walk(obj, self.to_model)
 
     def obj_from_model(self, obj: Any) -> Any:
-        return self._walk(obj, self.from_model)
+        return self._walk(obj, self._tool_from_model)
 
     def _walk(self, obj: Any, fn) -> Any:
         if isinstance(obj, str):

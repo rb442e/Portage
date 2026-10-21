@@ -23,20 +23,27 @@ export interface Proposal {
   risk: string;
   args: Record<string, any>;
   preview: {
-    kind: "mapping" | "catalog";
+    kind: "mapping" | "catalog" | "mcp_server";
     title: string;
     summary: string;
     catalog?: string;
     base?: string;
     new_name?: string;
+    server?: string;
+    url?: string;
+    transport?: "http" | "sse";
+    enabled_for_sora?: boolean;
     diff: EntryDiff & MappingDiff;
   };
   status: "pending" | "applied" | "rejected";
   result: { id?: number; name?: string; refresh?: string[] };
 }
 
+export interface AttachmentRef { id: string; name: string; kind: "text" | "image"; size: number; }
+
 export type CopilotEvent =
   | { type: "meta"; conversation_id: string; skill: { key: string; label: string } }
+  | { type: "context"; attachments: AttachmentRef[] }
   | { type: "token"; text: string }
   | { type: "tool_call"; name: string; args: Record<string, any> }
   | { type: "tool_result"; name: string; ok: boolean; summary: string }
@@ -51,15 +58,17 @@ export interface CopilotSettings {
   mode: "readonly" | "propose";
   redact: boolean;
   max_steps: number;
+  vision_model: string;
+  attachment_retention_days: number;
 }
 
 export interface CopilotStatus {
   settings: CopilotSettings;
-  llm: { reachable: boolean; models: string[]; model_available: boolean; detail: string };
+  llm: { reachable: boolean; models: string[]; model_available: boolean; vision_model_available: boolean; detail: string };
 }
 
 export interface ConversationSummary { id: string; title: string; updated_at: string; }
-export interface StoredMessage { role: "user" | "assistant"; content: string; meta: { skill?: string; tools?: string[]; proposals?: string[] }; }
+export interface StoredMessage { role: "user" | "assistant"; content: string; meta: { skill?: string; tools?: string[]; proposals?: string[]; attachments?: AttachmentRef[] }; }
 export interface ConversationDetail extends ConversationSummary { messages: StoredMessage[]; proposals: Proposal[]; }
 
 async function json<T>(path: string, init?: RequestInit): Promise<T> {
@@ -81,11 +90,25 @@ export const copilotApi = {
   deleteConversation: (id: string) => json<unknown>(`/conversations/${id}`, { method: "DELETE" }),
   apply: (id: string) => json<{ proposal: Proposal; result: Proposal["result"] }>(`/proposals/${id}/apply`, { method: "POST" }),
   reject: (id: string) => json<{ proposal: Proposal }>(`/proposals/${id}/reject`, { method: "POST" }),
+  upload: async (file: File): Promise<AttachmentRef> => {
+    const form = new FormData();
+    form.append("file", file, file.name);
+    const res = await fetch("/api/copilot/attachments", { method: "POST", body: form });
+    if (!res.ok) {
+      let detail = res.statusText;
+      try { detail = (await res.json()).detail || detail; } catch { /* ignore */ }
+      throw new Error(detail);
+    }
+    return res.json() as Promise<AttachmentRef>;
+  },
+  deleteAttachment: (id: string) => json<unknown>(`/attachments/${id}`, { method: "DELETE" }),
 };
+
+export const attachmentUrl = (id: string) => `/api/copilot/attachments/${id}`;
 
 /** POST /chat and dispatch each server-sent event as it arrives. */
 export async function streamChat(
-  body: { message: string; conversation_id: string; page: PageContext },
+  body: { message: string; conversation_id: string; page: PageContext; attachments?: string[] },
   onEvent: (e: CopilotEvent) => void,
   signal: AbortSignal,
 ): Promise<void> {

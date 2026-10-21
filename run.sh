@@ -23,8 +23,7 @@ cleanup() {
   echo ""
   echo "⏹  Stopping Portage…"
   [ -n "$FRONTEND_PID" ] && kill "$FRONTEND_PID" 2>/dev/null || true
-  [ -n "$BACKEND_PID" ] && kill "$BACKEND_PID" 2>/dev/null || true
-  pkill -f "uvicorn app.main:app" 2>/dev/null || true
+  [ -n "$BACKEND_PID" ] && { pkill -P "$BACKEND_PID" 2>/dev/null; kill "$BACKEND_PID" 2>/dev/null; } || true
   exit 0
 }
 trap cleanup INT TERM
@@ -48,19 +47,35 @@ echo ""
 
 # ---------------------------------------------------------------- backend ----
 cd "$BACKEND"
-if [ ! -d ".venv" ]; then
-  echo "→ creating Python virtual environment…"
-  python3 -m venv .venv
+if [ ! -x ".venv/bin/python" ]; then
+  BASE_PY=""
+  for cand in python3.13 python3.12 python3.11 python3.10 python3; do
+    if command -v "$cand" >/dev/null 2>&1 && "$cand" -c 'import sys; sys.exit(sys.version_info < (3, 10))' 2>/dev/null; then
+      BASE_PY="$cand"; break
+    fi
+  done
+  if [ -z "$BASE_PY" ]; then
+    echo "✗ Portage needs Python 3.10 or newer (found: $(python3 --version 2>&1)). Install it, e.g. 'brew install python@3.12'."
+    exit 1
+  fi
+  echo "→ creating Python virtual environment with $BASE_PY…"
+  "$BASE_PY" -m venv .venv
 fi
-# shellcheck disable=SC1091
-source .venv/bin/activate
+# Always use the venv's own interpreter; a bare 'pip' can resolve to another Python (e.g. Anaconda).
+PY="$BACKEND/.venv/bin/python"
+"$PY" -m pip --version >/dev/null 2>&1 || "$PY" -m ensurepip --upgrade >/dev/null
 echo "→ installing backend dependencies…"
-pip install -q --upgrade pip >/dev/null 2>&1 || true
-pip install -q -r requirements.txt
+"$PY" -m pip install -q --upgrade pip >/dev/null 2>&1 || true
+"$PY" -m pip install -q -r requirements.txt
 
 free_port "$BACKEND_PORT"
+if [ -z "${PORTAGE_SMTP_HOST:-}" ] && [ -z "${PORTAGE_AUTH_DISABLED:-}" ]; then
+  # Local development without a mail server: sign-in, sign-up and reset codes are printed below.
+  export PORTAGE_AUTH_DEV_LOG_CODES="${PORTAGE_AUTH_DEV_LOG_CODES:-1}"
+  echo "→ no PORTAGE_SMTP_HOST set: sign-in codes will be printed in this terminal"
+fi
 echo "→ starting backend (uvicorn --reload)…"
-uvicorn app.main:app --port "$BACKEND_PORT" --reload &
+"$PY" -m uvicorn app.main:app --port "$BACKEND_PORT" --reload &
 BACKEND_PID=$!
 
 # ---- wait for backend health ----

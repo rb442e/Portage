@@ -16,14 +16,14 @@ from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Type
 
 from pydantic import BaseModel, Field, ValidationError
 
-from .. import jobs, store
+from .. import jobs, product_settings, secretbox, store
 from ..config import settings as app_settings
 from ..engine.field_catalog import build_catalog
 from ..engine.mapping import ARTIFACT_TYPES
 from ..engine.transform import load_dataframe
 from ..schemas import LOOKUP_KINDS
 from ..versioning import diff_entries, diff_mappings
-from . import graph, knowledge
+from . import external_mcp, graph, knowledge
 
 
 class ToolError(Exception):
@@ -34,6 +34,7 @@ class ToolError(Exception):
 class ToolContext:
     conversation_id: str = ""
     page: Dict[str, Any] = field(default_factory=dict)
+    can_manage_mcp: bool = False
 
 
 @dataclass
@@ -290,22 +291,28 @@ def _distinct_values(ctx: ToolContext, a: DistinctArgs) -> Dict[str, Any]:
 class UnmappedArgs(BaseModel):
     source_id: Optional[str] = Field(default=None, description="Optional. Omit to use the current or latest upload")
     kind: str = Field(description="sprint, version, user or team")
-    column: Optional[str] = Field(default=None, description="CSV column; omit to auto-pick by kind")
+    column: Optional[str] = Field(default=None, description="Optional CSV column. Almost always omit it: the right column is chosen from the kind (Iteration for sprint, Release for version, Owner for user, Team for team)")
 
 
 def _find_unmapped(ctx: ToolContext, a: UnmappedArgs) -> Dict[str, Any]:
     kind = _norm_kind(a.kind)
     path = _source_path(ctx, a.source_id)
     df = load_dataframe(path)
-    cols = [a.column] if a.column else [c for c in _KIND_COLUMNS[kind] if c in df.columns]
-    if not cols or any(c not in df.columns for c in cols):
+    by_lower = {c.lower(): c for c in df.columns}
+    auto = [c for c in _KIND_COLUMNS[kind] if c in df.columns]
+    asked = by_lower.get((a.column or "").strip().lower())
+    cols = [asked] if asked else auto           # a guessed or misspelled column falls back to the right one
+    if not cols:
         raise ToolError(f"No suitable column for {kind}. Columns: {', '.join(df.columns)}")
     known = {k.strip().lower() for c in store.list_lookups(kind) for k in c["entries"]}
     series = df[cols].astype(str).stack().str.strip()
     counts = series[series != ""].value_counts()
     missing = [{"value": v, "count": int(c)} for v, c in counts.items() if v.lower() not in known]
-    return {"source_id": path.stem, "kind": kind, "columns": cols, "distinct_values": int(len(counts)),
-            "mapped": int(len(counts)) - len(missing), "unmapped_total": len(missing), "unmapped": missing[:50]}
+    out = {"source_id": path.stem, "kind": kind, "columns": cols, "distinct_values": int(len(counts)),
+           "mapped": int(len(counts)) - len(missing), "unmapped_total": len(missing), "unmapped": missing[:50]}
+    if a.column and not asked:
+        out["note"] = f"Column '{a.column}' does not exist, so {', '.join(cols)} was used"
+    return out
 
 
 def _list_jobs(ctx: ToolContext, a: LimitArgs) -> Dict[str, Any]:
@@ -315,17 +322,27 @@ def _list_jobs(ctx: ToolContext, a: LimitArgs) -> Dict[str, Any]:
 
 
 class JobArgs(BaseModel):
-    job_id: str
+    job_id: Optional[str] = Field(default=None, description="Optional. Omit for the most recent job; otherwise an id from list_jobs")
 
 
 def _get_job(ctx: ToolContext, a: JobArgs) -> Dict[str, Any]:
-    j = jobs.get_job(a.job_id)
+    recent = [j["job_id"] for j in jobs.list_jobs(5)]
+    job_id = a.job_id or (recent[0] if recent else "")
+    j = jobs.get_job(job_id) if job_id else None
     if not j:
-        raise ToolError(f"Job {a.job_id} not found")
-    failed = [{"id": i.external_id, "message": i.message[:200]} for i in j.items if i.status == "failed"][:10]
+        raise ToolError(f"Job '{a.job_id}' not found. Recent job ids: {', '.join(recent) or 'none yet'}" if a.job_id
+                        else "There are no migration jobs yet")
+    failed = [{"id": i.external_id, "message": i.message[:200]} for i in j.items if i.status == "failed"]
+    groups: Dict[str, Dict[str, Any]] = {}
+    for f in failed:                      # "Sprint 25 ..." and "Sprint 26 ..." are one cause, so group by message shape
+        g = groups.setdefault(re.sub(r"\d+", "#", f["message"]), {"count": 0, "examples": []})
+        g["count"] += 1
+        if len(g["examples"]) < 3:
+            g["examples"].append(f"{f['id']}: {f['message']}")
     return {"job_id": j.job_id, "state": j.state, "dry_run": j.dry_run, "total": j.total, "created": j.created,
-            "failed": j.failed, "attachments_uploaded": j.attachments_uploaded, "failed_items": failed,
-            "log_tail": j.log[-5:]}
+            "failed": j.failed, "attachments_uploaded": j.attachments_uploaded,
+            "failure_causes": [{"pattern": k, **v} for k, v in sorted(groups.items(), key=lambda kv: -kv[1]["count"])],
+            "failed_items": failed[:10], "log_tail": j.log[-5:]}
 
 
 class DocsArgs(BaseModel):
@@ -359,6 +376,27 @@ def _connection_status(ctx: ToolContext, a: NoArgs) -> Dict[str, Any]:
             "jira": {"configured": bool(jira.get("base_url")), "base_url": jira.get("base_url", ""),
                      "project_key": jira.get("project_key", "")},
             "rally": {"configured": bool(rally.get("api_key"))}}
+
+
+class McpTestArgs(BaseModel):
+    name: str = Field(min_length=1, max_length=32, description="Name of an MCP server already configured in Portage Settings")
+
+
+def _test_mcp_server(ctx: ToolContext, a: McpTestArgs) -> Dict[str, Any]:
+    name = a.name.strip().lower()
+    server = next((s for s in external_mcp._all_servers() if s.name == name), None)
+    if server is None:
+        names = external_mcp.names()
+        available = ", ".join(names) if names else "none configured"
+        raise ToolError(f"No configured MCP server named '{name}'. Available servers: {available}.")
+    probe = external_mcp.probe_saved(name)
+    transport = "stdio" if not server.url else ("SSE" if server.transport == "sse" else "Streamable HTTP")
+    if probe["status"] == "available":
+        summary = (f"{name} ({transport}) connected: {probe['tool_count']} read-only tools available; "
+                   f"{probe.get('blocked_count', 0)} blocked.")
+    else:
+        summary = f"{name} ({transport}) could not connect: {probe.get('error', 'server unavailable')}"
+    return {"name": name, "transport": transport, **probe, "summary": summary}
 
 
 # ---------------------------------------------------------------------------
@@ -486,9 +524,10 @@ class Pair(BaseModel):
 
 
 class CatalogUpsertArgs(BaseModel):
-    kind: str = Field(description="sprint, version, user or team")
-    entries: List[Pair] = Field(min_length=1, max_length=500)
-    note: str = Field(default="", description="Short reason for the change")
+    kind: str = Field(description="Catalog kind: sprint, version, user or team")
+    entries: List[Pair] = Field(min_length=1, max_length=500,
+                                description="One source/target pair per catalog row. For kind=user, source is the exact Rally user name and target is the exact Jira email or accountId. Preserve table cell boundaries; never combine values across columns. Each item has only source and target.")
+    note: str = Field(default="", description="Optional short reason for the change. This belongs at the top level, not inside entries.")
 
 
 def _clean_pairs(pairs: List[Pair]) -> Dict[str, str]:
@@ -581,6 +620,48 @@ def _apply_catalog_restore(a: CatalogRestoreArgs) -> Dict[str, Any]:
     return {"id": saved["id"], "kind": kind, "entries": len(saved["entries"]), "refresh": ["lookups"]}
 
 
+class McpHeader(BaseModel):
+    name: str = Field(description="HTTP header name, such as Authorization or X-API-Key")
+    value: str = Field(description="Header value. Preserve any <secret_N> placeholder exactly; Portage restores and encrypts it without exposing it in the proposal.")
+
+
+class McpServerArgs(BaseModel):
+    name: str = Field(min_length=1, max_length=32, description="Short unique id using lowercase letters, digits, - or _, e.g. docs")
+    transport: Literal["http", "sse"] = Field(description="Remote transport: Streamable HTTP or legacy SSE")
+    url: str = Field(min_length=1, max_length=2000, description="Full remote MCP endpoint URL")
+    headers: List[McpHeader] = Field(default_factory=list, max_length=20, description="Optional request headers. Never invent credentials or ask the user to paste secrets into chat; if a credential is supplied, preserve its <secret_N> placeholder exactly.")
+    enable_for_sora: bool = Field(default=True, description="Make explicitly read-only tools available to Sora after approval")
+
+
+def _mcp_payload(a: McpServerArgs) -> Dict[str, Any]:
+    return {"name": a.name, "transport": a.transport, "url": a.url,
+            "env": [{"key": h.name, "value": h.value} for h in a.headers]}
+
+
+def _plan_mcp_server(ctx: ToolContext, a: McpServerArgs) -> Dict[str, Any]:
+    if not ctx.can_manage_mcp or not external_mcp.editing_enabled():
+        raise ToolError("Only an administrator can add MCP servers. Ask an admin to enable MCP server editing in Portage Settings.")
+    clean = external_mcp.validate(_mcp_payload(a))
+    probe = external_mcp.probe_draft(_mcp_payload(a))
+    if probe["status"] == "available":
+        summary = f"Connection verified: {probe['tool_count']} read-only tools available; {probe.get('blocked_count', 0)} blocked."
+    else:
+        summary = f"Connection test failed: {probe.get('error', 'server unavailable')}. You can still save the endpoint and edit it in Settings."
+    return {"kind": "mcp_server", "title": f"Add remote MCP server {clean['name']}",
+            "server": clean["name"], "url": clean["url"], "transport": clean["transport"],
+            "summary": summary, "enabled_for_sora": a.enable_for_sora}
+
+
+def _apply_mcp_server(a: McpServerArgs) -> Dict[str, Any]:
+    clean = _mcp_payload(a)
+    external_mcp.save_server(clean)
+    if a.enable_for_sora:
+        selected = product_settings.get("mcp")["external_servers"]
+        if a.name not in selected:
+            product_settings.update("mcp", {"external_servers": [*selected, a.name]})
+    return {"name": a.name, "transport": a.transport, "refresh": ["mcp_servers"]}
+
+
 # ---------------------------------------------------------------------------
 # Registry
 # ---------------------------------------------------------------------------
@@ -611,12 +692,16 @@ _r("graph_search", "GraphRAG over Portage data: finds matching mappings, fields,
 _r("graph_overview", "Summarise the whole workspace: mapping versions per artifact, catalogs and their history, job states and top errors.",
    NoArgs, _graph_overview)
 _r("connection_status", "Show whether Jira/Rally connections are saved (never returns secrets).", NoArgs, _connection_status)
+_r("test_mcp_server", "Test a named MCP server already configured in Portage Settings. Supports local stdio and remote Streamable HTTP or SSE. It initializes the server and lists tools only; it does not call any tool or change data. Never expose credentials or launch details.",
+   McpTestArgs, _test_mcp_server)
 _w("propose_mapping_edit", "Add, change or remove field mappings for one artifact and save as a new mapping version.",
    MappingEditArgs, _plan_mapping_edit, _apply_mapping_edit)
-_w("propose_catalog_upsert", "Add or update entries in the sprint, version, user or team catalog.",
+_w("propose_catalog_upsert", "Add or update entries in the sprint, version, user or team catalog. For user rows, use the exact name as source and exact email/accountId as target; preserve each screenshot/table row separately and never infer an email.",
    CatalogUpsertArgs, _plan_catalog_upsert, _apply_catalog_upsert)
 _w("propose_catalog_remove", "Remove entries from a catalog.", CatalogRemoveArgs, _plan_catalog_remove, _apply_catalog_remove)
 _w("propose_catalog_restore", "Restore a catalog to an earlier version (undo).", CatalogRestoreArgs, _plan_catalog_restore, _apply_catalog_restore)
+_w("propose_mcp_server", "Add a remote MCP server to Portage Settings. Ask only for its name, URL and transport; never request credentials in chat. If the user supplies a credential, preserve its <secret_N> placeholder exactly. The proposal tests the connection and requires approval before saving.",
+   McpServerArgs, _plan_mcp_server, _apply_mcp_server)
 
 
 # ---------------------------------------------------------------------------
@@ -655,7 +740,11 @@ def execute(tool: Tool, ctx: ToolContext, raw_args: Any) -> Tuple[Dict[str, Any]
     if tool.risk == "read":
         return out, None
     pid = uuid.uuid4().hex[:12]
-    store.save_proposal(pid, ctx.conversation_id, tool.name, tool.risk, args.model_dump(), out)
+    stored_args = args.model_dump()
+    if tool.name == "propose_mcp_server":
+        stored_args["headers"] = [{"name": h["name"], "value": secretbox.encrypt(h["value"])}
+                                  for h in stored_args.get("headers", [])]
+    store.save_proposal(pid, ctx.conversation_id, tool.name, tool.risk, stored_args, out)
     store.audit(ctx.conversation_id, "proposal_created", tool.name, {"proposal_id": pid, "summary": out.get("summary")})
     return ({"status": "proposal_created", "proposal_id": pid, "summary": out.get("summary"),
              "note": "Awaiting user approval. The change is NOT applied yet."}, store.get_proposal(pid))
@@ -664,4 +753,8 @@ def execute(tool: Tool, ctx: ToolContext, raw_args: Any) -> Tuple[Dict[str, Any]
 def apply_proposal(proposal: Dict[str, Any]) -> Dict[str, Any]:
     tool = REGISTRY[proposal["tool"]]
     assert tool.apply is not None
-    return tool.apply(tool.model(**proposal["args"]))
+    args = proposal["args"]
+    if proposal["tool"] == "propose_mcp_server":
+        args = {**args, "headers": [{"name": h["name"], "value": secretbox.decrypt(h["value"])}
+                                     for h in args.get("headers", [])]}
+    return tool.apply(tool.model(**args))

@@ -1,6 +1,7 @@
 """Ollama chat client with streaming and native tool calling."""
 from __future__ import annotations
 
+import base64
 import json
 from typing import Any, Dict, Iterator, List
 
@@ -9,6 +10,10 @@ import requests
 
 class LLMUnavailable(RuntimeError):
     pass
+
+
+def model_installed(names: List[str], model: str) -> bool:
+    return any(n == model or n.split(":")[0] == model for n in names)
 
 
 class OllamaClient:
@@ -24,9 +29,27 @@ class OllamaClient:
             names = [m.get("name", "") for m in r.json().get("models", [])]
         except (requests.RequestException, ValueError) as e:
             return {"reachable": False, "models": [], "model_available": False, "detail": str(e)[:200]}
-        return {"reachable": True, "models": names,
-                "model_available": any(n == self.model or n.split(":")[0] == self.model for n in names),
+        return {"reachable": True, "models": names, "model_available": model_installed(names, self.model),
                 "detail": ""}
+
+    def describe_images(self, images: List[bytes], prompt: str) -> str:
+        """One non-streaming call to a vision model. Returns its text."""
+        body = {"model": self.model, "stream": False, "options": {"temperature": 0.1, "num_ctx": 4096},
+                "messages": [{"role": "user", "content": prompt,
+                              "images": [base64.b64encode(i).decode() for i in images]}]}
+        try:
+            r = requests.post(f"{self.base_url}/api/chat", json=body, timeout=self.timeout)
+        except requests.RequestException as e:
+            raise LLMUnavailable(f"Cannot reach Ollama at {self.base_url}. ({str(e)[:120]})") from e
+        if r.status_code == 404:
+            raise LLMUnavailable(f"Vision model '{self.model}' not found. Run: ollama pull {self.model}")
+        if r.status_code >= 400:
+            raise LLMUnavailable(f"Vision model '{self.model}' could not run ({r.status_code}: {r.text[:160]}). "
+                                 "Choose another vision model in Settings, for example gemma3:4b.")
+        text = ((r.json().get("message") or {}).get("content") or "").strip()
+        if not text:
+            raise LLMUnavailable(f"Vision model '{self.model}' returned no text")
+        return text
 
     def chat_stream(self, messages: List[Dict[str, Any]], tools: List[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:
         """Yield {"type": "token", "text"} and {"type": "tool_calls", "calls": [{name, arguments}]}."""

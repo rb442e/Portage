@@ -16,7 +16,8 @@ def sources(section):
 
 def test_defaults_and_sections():
     assert [s.key for s in ps.SECTIONS] == ["sora", "mcp", "graph"]
-    assert ps.get("mcp") == {"enabled": True, "read_only": False, "redact": True, "hidden_tools": []}
+    assert ps.get("mcp") == {"enabled": True, "read_only": False, "redact": True,
+                              "hidden_tools": [], "external_servers": []}
     assert ps.get("graph") == {"default_depth": 2, "max_nodes": 24}
     assert set(sources("sora").values()) == {"default"}
 

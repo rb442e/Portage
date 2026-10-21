@@ -1,6 +1,10 @@
-import { NavLink, Route, Routes } from "react-router-dom";
+import { NavLink, Navigate, Route, Routes } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useApp } from "./store";
+import { ROLE_LABEL, useAuth } from "./auth/AuthContext";
+import type { Role } from "./types";
+import Users from "./pages/Users";
 import Dashboard from "./pages/Dashboard";
 import Connections from "./pages/Connections";
 import MappingStudio from "./pages/MappingCanvas";
@@ -29,9 +33,10 @@ const NavIcon = {
   split: (<svg width="18" height="18" viewBox="0 0 24 24" {...s}><circle cx="6" cy="6" r="3" /><circle cx="6" cy="18" r="3" /><path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12" /></svg>),
   copydesc: (<svg width="18" height="18" viewBox="0 0 24 24" {...s}><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>),
   settings: (<svg width="18" height="18" viewBox="0 0 24 24" {...s}><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h12M20 18h0" /><circle cx="16" cy="6" r="2" /><circle cx="8" cy="12" r="2" /><circle cx="18" cy="18" r="2" /></svg>),
+  users: (<svg width="18" height="18" viewBox="0 0 24 24" {...s}><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0" /><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6" /></svg>),
 };
 
-const NAV: { to: string; label: string; icon: ReactNode; end?: boolean }[] = [
+const NAV: { to: string; label: string; icon: ReactNode; end?: boolean; role?: Role }[] = [
   { to: "/", label: "Dashboard", icon: NavIcon.dashboard, end: true },
   { to: "/connections", label: "Connections", icon: NavIcon.connections },
   { to: "/mapping", label: "Mapping Studio", icon: NavIcon.mapping },
@@ -42,7 +47,8 @@ const NAV: { to: string; label: string; icon: ReactNode; end?: boolean }[] = [
   { to: "/split", label: "Split File", icon: NavIcon.split },
   { to: "/copy-description", label: "Copy Description", icon: NavIcon.copydesc },
   { to: "/reports", label: "Reports", icon: NavIcon.reports },
-  { to: "/settings", label: "Settings", icon: NavIcon.settings },
+  { to: "/settings", label: "Settings", icon: NavIcon.settings, role: "admin" },
+  { to: "/users", label: "Users", icon: NavIcon.users, role: "admin" },
 ];
 
 function StatusPill({ label, ok }: { label: string; ok: boolean }) {
@@ -53,9 +59,40 @@ function StatusPill({ label, ok }: { label: string; ok: boolean }) {
   );
 }
 
+function UserMenu() {
+  const { user, signOut } = useAuth();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [open]);
+  if (user.auth_disabled) return <span className="badge warn" title="PORTAGE_AUTH_DISABLED is set">Sign-in off</span>;
+  return (
+    <div className="um-menu" ref={ref}>
+      <button className="um-trigger" onClick={() => setOpen(!open)} aria-haspopup="menu" aria-expanded={open}>
+        <span className="um-avatar">{(user.name || user.email)[0].toUpperCase()}</span>
+        <span className={`um-badge ${user.role}`}>{ROLE_LABEL[user.role]}</span>
+      </button>
+      {open && (
+        <div className="um-pop" role="menu">
+          <div className="um-pop-head">
+            <div className="um-email">{user.name || user.email}</div>
+            <div className="um-meta">{user.name ? `${user.email} · ` : ""}{ROLE_LABEL[user.role]}</div>
+          </div>
+          <button role="menuitem" className="um-pop-item" onClick={() => void signOut()}>Sign out</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function App() {
   const { jiraVerified, rallyVerified } = useApp();
   const { open, setOpen } = useCopilot();
+  const { can } = useAuth();
   return (
     <div className="app">
       <aside className="sidebar">
@@ -67,7 +104,7 @@ export default function App() {
           </div>
         </div>
         <div className="nav-section">Workspace</div>
-        {NAV.map((n) => (
+        {NAV.filter((n) => !n.role || can(n.role)).map((n) => (
           <NavLink key={n.to} to={n.to} end={n.end}
             className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
             <span className="nav-icon">{n.icon}</span> {n.label}
@@ -87,9 +124,13 @@ export default function App() {
             <button className={`cp-ask ${open ? "on" : ""}`} onClick={() => setOpen(!open)} title="Ask Sora (Ctrl/Cmd+K)" aria-label="Ask Sora">
               <SoraIcon size={22} /> Ask Sora
             </button>
+            <UserMenu />
           </div>
         </header>
         <div className="content">
+          {!can("member") && (
+            <div className="um-viewonly" role="note">You have view-only access. Ask an admin if you need to make changes.</div>
+          )}
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/connections" element={<Connections />} />
@@ -101,7 +142,8 @@ export default function App() {
             <Route path="/split" element={<SplitFile />} />
             <Route path="/copy-description" element={<CopyDescription />} />
             <Route path="/reports" element={<Reports />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/settings" element={can("admin") ? <Settings /> : <Navigate to="/" replace />} />
+            <Route path="/users" element={can("admin") ? <Users /> : <Navigate to="/" replace />} />
           </Routes>
         </div>
       </div>

@@ -110,15 +110,44 @@ export type SettingValue = boolean | number | string | string[];
 export interface SettingsField {
   key: string; label: string; type: "bool" | "int" | "text" | "choice" | "multi"; help: string; env: string;
   default: SettingValue; value: SettingValue; source: "saved" | "env" | "default";
-  choices: string[]; labels: Record<string, string>; min: number | null; max: number | null;
+  choices: string[]; labels: Record<string, string>; min: number | null; max: number | null; hidden?: boolean;
 }
 export interface SettingsSection { key: string; label: string; summary: string; fields: SettingsField[]; }
 export interface SettingsView {
   sections: SettingsSection[];
   system: { label: string; value: string; env: string }[];
-  effective_mcp: { enabled: boolean; redact: boolean; read_only: boolean; hidden_tools: string[] };
+  effective_mcp: { enabled: boolean; redact: boolean; read_only: boolean; hidden_tools: string[]; external_servers: string[] };
 }
 export interface McpConnection { transport: string; shell: string; vscode: string; generic: string; }
+export type Role = "admin" | "member" | "viewer";
+export interface AuthUser {
+  email: string; name: string; role: Role; status: "active" | "disabled" | "pending" | "rejected";
+  invited_by?: string; created_at?: string | null; last_login_at?: string | null; auth_disabled?: boolean; has_password?: boolean;
+}
+export interface AuthConfig {
+  enabled: boolean; email_configured: boolean; dev_codes: boolean; code_ttl_minutes: number; resend_seconds: number;
+  signup_open: boolean; password_min: number;
+}
+export interface UserDirectory { users: AuthUser[]; admin_emails: string[]; allowed_domains: string[]; roles: Role[]; }
+export interface McpProbe {
+  name: string; status?: "available" | "unavailable" | "invalid configuration"; tool_count: number; blocked_count?: number;
+  tools?: string[]; tool_descriptions?: Record<string, string>; blocked?: { name: string; reason: string }[]; error?: string;
+}
+export interface ExternalMcpStatus { enabled_for_sora: string[]; servers: McpProbe[]; }
+export interface McpServerDef {
+  name: string; source: "environment" | "ui";
+  transport?: "stdio" | "http" | "sse"; url?: string;
+  command?: string; args?: string[]; cwd?: string; env_keys?: string[];
+}
+export interface McpServerDefs {
+  editing_enabled: boolean; flag: string; max_servers: number; config_error: string;
+  servers: McpServerDef[]; enabled_for_sora: string[]; disabled_tools: string[];
+}
+export interface McpServerInput {
+  transport?: "stdio" | "http" | "sse"; url?: string;
+  name: string; command: string; args: string[]; cwd: string;
+  env: { key: string; value: string }[]; enable_for_sora?: boolean; current?: string | null;
+}
 export interface EntryDiff {
   added: Record<string, string>;
   removed: Record<string, string>;

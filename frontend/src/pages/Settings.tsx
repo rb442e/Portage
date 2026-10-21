@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../api";
+import ExternalMcpPanel from "./ExternalMcpPanel";
 import type { McpConnection, SettingsField, SettingsSection, SettingsView, SettingValue } from "../types";
 
 type Drafts = Record<string, Record<string, SettingValue>>;
@@ -52,13 +53,14 @@ function SectionForm({ section, draft, setDraft, onSave, onReset, busy }: {
   setDraft: (key: string, v: SettingValue) => void;
   onSave: () => void; onReset: (key?: string) => void; busy: boolean;
 }) {
-  const dirty = section.fields.some((f) => !same(draft[f.key], f.value));
-  const anySaved = section.fields.some((f) => f.source === "saved");
+  const fields = section.fields.filter((f) => !f.hidden);
+  const dirty = fields.some((f) => !same(draft[f.key], f.value));
+  const anySaved = fields.some((f) => f.source === "saved");
   return (
     <div className="card">
       <p className="card-title">{section.label}</p>
       <p className="card-sub">{section.summary}</p>
-      {section.fields.map((f) => (
+      {fields.map((f) => (
         <div className="st-field" key={f.key}>
           <div className="st-label">
             <span>{f.label}</span>
@@ -138,7 +140,7 @@ export default function Settings() {
   }
 
   function save(s: SettingsSection) {
-    const changed = Object.fromEntries(s.fields.filter((f) => !same(drafts[s.key][f.key], f.value)).map((f) => [f.key, drafts[s.key][f.key]]));
+    const changed = Object.fromEntries(s.fields.filter((f) => !f.hidden && !same(drafts[s.key][f.key], f.value)).map((f) => [f.key, drafts[s.key][f.key]]));
     return run(() => api.saveSettings(s.key, changed), `${s.label} settings saved`);
   }
 
@@ -173,7 +175,10 @@ export default function Settings() {
           onSave={() => save(section)}
           onReset={(key) => run(() => api.resetSetting(section.key, key), key ? "Reset to default" : `${section.label} reset`)} />
       )}
-      {tab === "mcp" && <McpConnect />}
+      {tab === "mcp" && <>
+        <ExternalMcpPanel enabled={eff.external_servers} onSettingsView={setView} />
+        <McpConnect />
+      </>}
 
       {tab === "system" && (
         <div className="card">

@@ -341,6 +341,24 @@ def _expand(g: Graph, seeds: List[str], scores: Dict[str, float], depth: int, ma
     return keep, omitted
 
 
+def _facts(g: Graph, edges: List[Edge], keep: Dict[str, int]) -> List[str]:
+    """Plain-English statements of the most useful relationships, so a small model need not read raw edges."""
+    nearest = sorted(edges, key=lambda e: keep[e.src] + keep[e.dst])
+    out: List[str] = []
+    for e in nearest:
+        s, d = g.nodes[e.src], g.nodes[e.dst]
+        if e.rel == "feeds":
+            out.append(f"Rally field '{s.props['key']}' feeds Jira field '{d.props['key']}' ({d.props['artifact']}) in "
+                       + ", ".join(e.props.get("mappings", [])[:3]))
+        elif e.rel == "translates":
+            out.append(f"The {s.props['kind']} catalog '{s.label}' translates values for Jira field '{d.props['key']}'; it is a catalog, not a Rally field")
+        elif e.rel == "mentions" and s.type == "error":
+            out.append(f"Failure '{s.label}' ({s.props.get('occurrences', 0)} items) involves {d.type.replace('_', ' ')} '{d.label}'")
+        elif e.rel == "supersedes":
+            out.append(f"Mapping '{s.label}' replaces the older '{d.label}'")
+    return out[:8]
+
+
 def search(query: str, depth: Optional[int] = None, max_nodes: Optional[int] = None) -> Dict[str, Any]:
     """Graph-grounded retrieval: best-matching items, their multi-hop neighbourhood, and linked docs.
 
@@ -366,6 +384,7 @@ def search(query: str, depth: Optional[int] = None, max_nodes: Optional[int] = N
             if text:
                 docs.append({"source": "Portage guide", "heading": heading, "text": text})
     result = {"query": query, "seeds": [_fmt_node(g.nodes[s]) for s in seeds],
+              "facts": _facts(g, edges, keep),
               "relationships": [_fmt_edge(g, e) for e in edges],
               "nodes": [_fmt_node(g.nodes[n]) for n in keep if n not in seeds],
               "docs": [{"heading": d["heading"], "text": d["text"][:300]} for d in docs[:3]],

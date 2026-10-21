@@ -5,6 +5,7 @@ import type {
   MappingValidation, AttachmentIdsResult, AttachmentJob, AttachmentRunRequest, ParentMapResult, SplitResult,
   CopyDescriptionResult, CopyDescIdsResult, CopyDescJob, SavedConnectionState, LookupVersion, EntryDiff,
   SettingsView, SettingValue, McpConnection,
+  ExternalMcpStatus, McpServerDefs, McpServerInput, McpProbe, AuthConfig, AuthUser, UserDirectory, Role,
 } from "./types";
 
 const BASE = "/api";
@@ -17,6 +18,7 @@ async function req<T>(path: string, options: RequestInit = {}): Promise<T> {
   if (!res.ok) {
     let detail = res.statusText;
     try { detail = (await res.json()).detail || detail; } catch { /* ignore */ }
+    if (res.status === 401 && !path.startsWith("/auth/")) window.dispatchEvent(new Event("portage:signed-out"));
     throw new Error(detail);
   }
   return res.json() as Promise<T>;
@@ -69,6 +71,30 @@ export interface CopyDescBulkRequest {
 }
 
 export const api = {
+  authConfig: () => req<AuthConfig>("/auth/config"),
+  me: () => req<{ user: AuthUser }>("/auth/me"),
+  requestCode: (email: string) =>
+    req<{ sent: boolean; message: string }>("/auth/request-code", { method: "POST", body: JSON.stringify({ email }) }),
+  verifyCode: (email: string, code: string) =>
+    req<{ user: AuthUser }>("/auth/verify", { method: "POST", body: JSON.stringify({ email, code }) }),
+  logout: () => req<{ signed_out: boolean }>("/auth/logout", { method: "POST" }),
+  login: (email: string, password: string) =>
+    req<{ user: AuthUser }>("/auth/login", { method: "POST", body: JSON.stringify({ email, password }) }),
+  signup: (email: string, password: string) =>
+    req<{ sent: boolean }>("/auth/signup", { method: "POST", body: JSON.stringify({ email, password }) }),
+  signupVerify: (email: string, code: string) =>
+    req<{ status: "signed_in" | "pending"; user?: AuthUser }>("/auth/signup/verify", { method: "POST", body: JSON.stringify({ email, code }) }),
+  forgotPassword: (email: string) =>
+    req<{ sent: boolean }>("/auth/password/forgot", { method: "POST", body: JSON.stringify({ email }) }),
+  resetPassword: (email: string, code: string, password: string) =>
+    req<{ user: AuthUser }>("/auth/password/reset", { method: "POST", body: JSON.stringify({ email, code, password }) }),
+  updateUser: (email: string, patch: { role?: Role; status?: "active" | "disabled" | "rejected" }) =>
+    req<UserDirectory>(`/auth/users/${encodeURIComponent(email)}`, { method: "PATCH", body: JSON.stringify(patch) }),
+  users: () => req<UserDirectory>("/auth/users"),
+  addUser: (email: string, role: Role, name = "") =>
+    req<UserDirectory>("/auth/users", { method: "POST", body: JSON.stringify({ email, role, name }) }),
+  removeUser: (email: string) => req<UserDirectory>(`/auth/users/${encodeURIComponent(email)}`, { method: "DELETE" }),
+
   health: () => req<{ status: string; version: string }>("/health"),
 
   testConnections: (jira?: JiraConnection, rally?: RallyConnection) =>
@@ -252,4 +278,17 @@ export const api = {
   resetSetting: (section: string, key?: string) =>
     req<SettingsView>(key ? `/settings/${section}/${key}` : `/settings/${section}`, { method: "DELETE" }),
   mcpConnection: () => req<McpConnection>("/settings/mcp/connection"),
+  externalMcpServers: () => req<ExternalMcpStatus>("/settings/mcp/external-servers"),
+  mcpServers: () => req<McpServerDefs>("/settings/mcp/servers"),
+  saveExternalMcpToolAccess: (disabled_tools: string[]) =>
+    req<McpServerDefs>("/settings/mcp/servers/tool-access", { method: "PUT", body: JSON.stringify({ disabled_tools }) }),
+  addMcpServer: (b: McpServerInput) => req<McpServerDefs>("/settings/mcp/servers", { method: "POST", body: JSON.stringify(b) }),
+  updateMcpServer: (name: string, b: McpServerInput) =>
+    req<McpServerDefs>(`/settings/mcp/servers/${encodeURIComponent(name)}`, { method: "PUT", body: JSON.stringify(b) }),
+  deleteMcpServer: (name: string) =>
+    req<McpServerDefs>(`/settings/mcp/servers/${encodeURIComponent(name)}`, { method: "DELETE" }),
+  testMcpServer: (name: string) =>
+    req<McpProbe>(`/settings/mcp/servers/${encodeURIComponent(name)}/test`, { method: "POST" }),
+  testMcpDraft: (b: McpServerInput) =>
+    req<McpProbe>("/settings/mcp/servers/test", { method: "POST", body: JSON.stringify(b) }),
 };
