@@ -49,6 +49,20 @@ printed in the backend console. Use `PORTAGE_AUTH_DISABLED=1` to skip sign-in en
 See [Sign-in and roles](#sign-in-and-roles).
 API docs: http://localhost:8000/docs
 
+#### Toggle local authentication
+
+Copy `.env.local.example` to `.env.local` in the repository root and set:
+
+```dotenv
+PORTAGE_AUTH_DISABLED=1
+```
+
+Set the flag to `1` to skip sign-in and use local admin access, or `0` to require
+authentication. Restart the backend and refresh the browser after changing it.
+The backend loads this file with either `./run.sh` or a direct Uvicorn launch.
+Explicit environment variables take precedence over the file. `.env.local` is
+excluded from Git. Use disabled authentication only on a single-user machine.
+
 ### 2. Frontend
 ```bash
 cd portage/frontend

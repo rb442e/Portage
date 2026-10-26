@@ -9,6 +9,13 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+
+# Local overrides work with both the dev launcher and direct backend startup.
+# Explicit process environment variables take precedence.
+load_dotenv(Path(__file__).resolve().parents[2] / ".env.local", override=False)
+
 
 class Settings:
     def __init__(self) -> None:
