@@ -473,10 +473,14 @@ async def _call(server: ServerConfig, name: str, arguments: Dict[str, Any]) -> D
 
 
 def _coerce_schema_value(value: Any, schema: Dict[str, Any], path: str) -> Any:
-    """Repair local-model calls that encode schema containers as JSON strings."""
+    """Repair unambiguous JSON values serialized as strings by local models."""
     expected = schema.get("type")
     if isinstance(expected, list):
         expected = next((t for t in expected if t in ("array", "object") and value is not None), expected[0])
+    if expected == "boolean" and isinstance(value, str):
+        literal = value.strip().lower()
+        if literal in ("true", "false"):
+            return literal == "true"
     if expected in ("array", "object") and isinstance(value, str):
         try:
             value = json.loads(value)
@@ -505,7 +509,7 @@ def _coerce_schema_value(value: Any, schema: Dict[str, Any], path: str) -> Any:
 
 
 def normalize_arguments(remote: RemoteTool, arguments: Dict[str, Any], session_id: Optional[str] = None) -> Dict[str, Any]:
-    """Coerce schema-declared containers before passing arguments to an MCP server."""
+    """Normalize schema-declared values and validate before making a remote call."""
     if not isinstance(arguments, dict):
         raise ExternalMcpError("Tool arguments must be an object")
     properties = remote.schema.get("properties", {})

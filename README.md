@@ -85,6 +85,10 @@ ollama pull llama3.1:8b      # once; then keep `ollama serve` running
 - **Redaction on by default:** emails and secrets are masked before reaching the model (⚙ in the panel to change).
 - **Skills:** `@mapping`, `@catalog`, `@migration`, `@guide`, `@lineage`. Modes, model and URL are configurable in ⚙
   or via `PORTAGE_OLLAMA_URL`, `PORTAGE_COPILOT_MODEL`, `PORTAGE_COPILOT_MODE`.
+- **Skill files:** each skill is a versioned Markdown file at
+  [`backend/app/copilot/skills/`](backend/app/copilot/skills/). Its YAML front matter defines selection keywords,
+  routes, suggestions, and allowed tools; its Markdown body contains Sora’s instructions. Portage validates the
+  complete skill set when it starts.
 - Tests: `cd backend && pip install pytest httpx && pytest tests` (add `PORTAGE_LIVE_LLM=1` to also run the checks against your local Ollama model).
 
 ### Give Sora context: files and screenshots
@@ -235,6 +239,18 @@ cd portage/frontend && npm run build      # emits frontend/dist
 cd ../backend && PORTAGE_FRONTEND_DIST=../frontend/dist uvicorn app.main:app --port 8000
 ```
 Or `docker compose up` (see `docker-compose.yml`).
+
+## Developer verification
+
+The project-local [verify-portage skill](.agents/skills/verify-portage/SKILL.md) provides isolated runtime checks and a maintained feature map for MCP and Sora behavior:
+
+```bash
+backend/.venv/bin/python .agents/skills/verify-portage/scripts/verify_portage.py doctor
+backend/.venv/bin/python .agents/skills/verify-portage/scripts/verify_portage.py run mcp
+uv run --with playwright python .agents/skills/verify-portage/scripts/verify_portage.py run local
+```
+
+The browser group needs Playwright Chromium (`uv run --with playwright python -m playwright install chromium`). It builds the current frontend into a fresh temporary directory. Reports and screenshots/traces survive process cleanup; the command prints their location. `sora-web` and `failed-fetch` are separate opt-in groups requiring local Ollama; `sora-web` also calls live Parallel MCP. A missing prerequisite is blocked, and generated failure explanations require review rather than receiving an automatic pass. See the skill for exit codes and exact coverage.
 
 ## Roadmap
 See [PRODUCT.md](PRODUCT.md) for the product vision, competitive positioning

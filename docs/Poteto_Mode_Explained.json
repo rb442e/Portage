@@ -1,0 +1,96 @@
+{
+  "source": "/Users/rajeevbhatnagar/.codex/plugins/cache/cursor-plugins/pstack/0.15.30/skills/poteto-mode/SKILL.md",
+  "source_sha256": "c737dbde79b38c316cbed6dcbcd90d4f95a9615eac8364ab2bdb94d7f06ae7ce",
+  "version": "0.15.30",
+  "voice": "Samantha",
+  "chapters": [
+    {
+      "start": 0.16138262500000167,
+      "duration": 16.737875,
+      "scene": "intent",
+      "chapter": "THE BIG IDEA"
+    },
+    {
+      "start": 19.006420959000003,
+      "duration": 21.235104166666666,
+      "scene": "purpose",
+      "chapter": "01 / THE INTENTION"
+    },
+    {
+      "start": 41.905897542000005,
+      "duration": 22.249625,
+      "scene": "anatomy",
+      "chapter": "02 / INSIDE SKILL.MD"
+    },
+    {
+      "start": 65.842050625,
+      "duration": 21.8760625,
+      "scene": "route",
+      "chapter": "03 / ONE REQUEST, ONE WORKFLOW"
+    },
+    {
+      "start": 89.340795,
+      "duration": 23.951854166666667,
+      "scene": "how-why",
+      "chapter": "04 / UNDERSTAND BEFORE DESIGN"
+    },
+    {
+      "start": 114.92888691700001,
+      "duration": 27.789083333333334,
+      "scene": "design",
+      "chapter": "05 / DESIGN WITH EVIDENCE"
+    },
+    {
+      "start": 144.357382459,
+      "duration": 23.791020833333334,
+      "scene": "shape",
+      "chapter": "06 / MODEL THE DOMAIN"
+    },
+    {
+      "start": 169.79607666700002,
+      "duration": 25.425729166666667,
+      "scene": "delegate",
+      "chapter": "07 / DELEGATE DELIBERATELY"
+    },
+    {
+      "start": 196.84409029199998,
+      "duration": 23.9441875,
+      "scene": "proof",
+      "chapter": "08 / PROVE IT WORKS"
+    },
+    {
+      "start": 222.455800625,
+      "duration": 26.631666666666668,
+      "scene": "pause",
+      "chapter": "09 / AUTONOMY WITH BOUNDARIES"
+    },
+    {
+      "start": 250.743303792,
+      "duration": 22.5898125,
+      "scene": "audit",
+      "chapter": "10 / WATCH THE WORK"
+    },
+    {
+      "start": 274.94437529199996,
+      "duration": 21.77275,
+      "scene": "prompt",
+      "chapter": "11 / YOUR PART OF THE CONTRACT"
+    },
+    {
+      "start": 298.381601334,
+      "duration": 23.5375625,
+      "scene": "closing",
+      "chapter": "POTETO MODE / THE TAKEAWAY"
+    }
+  ],
+  "video": "/Users/rajeevbhatnagar/Documents/portage/docs/Poteto_Mode_Explained.mp4",
+  "kind": "illustrated educational explanation",
+  "quality_checks": {
+    "full_video_audio_decode": "passed",
+    "embedded_english_captions": "extracted successfully",
+    "chapter_markers": 13,
+    "frame_size": "1920x1080",
+    "sample_rate_hz": 48000,
+    "bytes": 21338077
+  }
+}

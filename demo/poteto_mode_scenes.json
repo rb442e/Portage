@@ -1,0 +1,85 @@
+[
+  {
+    "id": "intent", "chapter": "THE BIG IDEA", "title": "A short request.\nA deeper way of working.",
+    "subtitle": "Understanding Lauren Tan’s poteto-mode", "kind": "hero",
+    "takeaway": "You provide the outcome. The skill supplies a disciplined approach.",
+    "narration": "Imagine giving an engineer a short request, and also handing them your team's engineering handbook. That is a useful way to understand poteto mode. In this film, we will unpack Lauren Tan's skill file, then follow an illustrated Portage feature from a user's intention to evidence that it works."
+  },
+  {
+    "id": "purpose", "chapter": "01 / THE INTENTION", "title": "Make good engineering\nrepeatable.",
+    "subtitle": "An interpretation of the instructions, grounded in the installed skill", "kind": "principles",
+    "cards": [{"label":"UNDERSTAND","title":"Read before changing","body":"Build a working model of the system."},{"label":"SIMPLIFY","title":"Choose a clear shape","body":"Prefer the smallest justified solution."},{"label":"VERIFY","title":"Prove the outcome","body":"Exercise the behavior the user depends on."}],
+    "takeaway": "The ambition is reliable judgment, supported by observable work.",
+    "narration": "The file describes Lauren's preferred engineering style. Read the system before changing it. Choose clear structures. Keep the code and explanation simple. Delegate deliberately, and verify the outcome. My interpretation is that she wants these habits to become repeatable, so an agent can carry more of the engineering work while leaving evidence that a person can review."
+  },
+  {
+    "id": "anatomy", "chapter": "02 / INSIDE SKILL.MD", "title": "A handbook with\na routing table.",
+    "subtitle": "The file tells an agent what to read and what to do next", "kind": "file",
+    "cards": [{"label":"METADATA","title":"Identity and invocation","body":"Names the skill and describes its purpose."},{"label":"TRIGGERS","title":"Situation → next skill","body":"Architecture questions lead to investigation and design."},{"label":"PRINCIPLES + PLAYBOOKS","title":"Judgment and procedure","body":"Rules shape decisions. Playbooks organize tasks."}],
+    "takeaway": "A Markdown skill gives instructions. Codex still performs the actions.",
+    "narration": "Open skill dot M D and you will find several layers. Metadata identifies the skill. Triggers connect situations to other skills. Principles guide decisions. Playbooks organize different tasks, such as features, bug fixes, and investigations. This is instruction text read by an agent. It is not an executable engine that automatically forces every step to happen."
+  },
+  {
+    "id": "route", "chapter": "03 / ONE REQUEST, ONE WORKFLOW", "title": "The request chooses\nthe playbook.",
+    "subtitle": "Illustrated Portage request: add OAuth for remote MCP servers", "kind": "route",
+    "takeaway": "A feature, a bug, and a question need different workflows.",
+    "narration": "Suppose you ask, use poteto mode to add OAuth for remote MCP servers in Portage. The agent recognizes a feature request and reads the feature playbook. A broken connection would instead call for a bug fix. A question about how authentication works would call for an investigation. The mode coordinates the relevant workflow. It does not run every skill for every request."
+  },
+  {
+    "id": "how-why", "chapter": "04 / UNDERSTAND BEFORE DESIGN", "title": "How finds the mechanism.\nWhy finds the rationale.",
+    "subtitle": "Two questions about the same system", "kind": "compare",
+    "cards": [{"label":"HOW","title":"What happens today?","body":"Trace settings → credential storage → MCP requests → Sora."},{"label":"WHY","title":"What led to this design?","body":"Inspect history and available records. Label inference and missing evidence."}],
+    "takeaway": "Use why when existing decisions matter. Do not invent their motivation.",
+    "narration": "The how skill traces what the system actually does. For Portage, that means following settings, credential storage, MCP connections, and Sora tool calls. The why skill asks what led to that design, using history and available records. Why becomes especially relevant when ownership or layering changes. If the evidence is missing, the agent should say so rather than inventing the original intention."
+  },
+  {
+    "id": "design", "chapter": "05 / DESIGN WITH EVIDENCE", "title": "Explore the shape.\nThen plan the work.",
+    "subtitle": "architect explores alternatives; arena compares and synthesizes them", "kind": "design",
+    "takeaway": "A separate design approval checkpoint must be requested explicitly.",
+    "narration": "Next comes architecture. The architect skill uses arena to explore different designs and synthesize a choice. For OAuth, an illustrative comparison is SDK managed authentication versus application managed authentication. The agent should investigate actual support before choosing. The feature workflow then breaks delivery into verifiable units. A separate plan is not a universal skill. If you want to approve the design first, explicitly request that checkpoint."
+  },
+  {
+    "id": "shape", "chapter": "06 / MODEL THE DOMAIN", "title": "Make the states\nvisible.",
+    "subtitle": "Illustrated OAuth lifecycle. This is not an implemented Portage feature.", "kind": "states",
+    "takeaway": "A clear state model makes transitions and failure paths easier to reason about.",
+    "narration": "One of the file's recurring ideas is to model the domain before filling in logic. In an OAuth example, disconnected, authorizing, connected, refreshing, and reconnect required are meaningful states. Making those transitions explicit can be clearer than scattering unrelated flags across the code. This diagram illustrates the principle. It does not claim that OAuth has already been implemented in Portage."
+  },
+  {
+    "id": "delegate", "chapter": "07 / DELEGATE DELIBERATELY", "title": "One accountable lead.\nFocused supporting roles.",
+    "subtitle": "Parallel work is useful when ownership and boundaries are clear", "kind": "team",
+    "takeaway": "The coordinator reviews and integrates. It remains accountable for the result.",
+    "narration": "Poteto mode asks the lead agent to delegate focused work, then own the result. Investigators can inspect different areas. An implementation agent can work within a defined scope. A reviewer can challenge the result. Independent work may run in parallel, but shared changes need coordination. The exact agent types and model choices depend on the host. Installing the skill cannot create capabilities that Codex does not expose."
+  },
+  {
+    "id": "proof", "chapter": "08 / PROVE IT WORKS", "title": "Done needs\nobservable evidence.",
+    "subtitle": "verify-portage connects the engineering workflow to the actual application", "kind": "proof",
+    "cards": [{"label":"EXERCISE","title":"Drive the real journey","body":"Connect, discover, call a tool, and change its access."},{"label":"OBSERVE","title":"Inspect the result","body":"Check tool events, stored state, screenshots, and errors."},{"label":"REPORT","title":"Separate outcomes","body":"Passed · Failed · Blocked · Review required"}],
+    "takeaway": "A green build is one check. It does not establish that a user journey works.",
+    "narration": "Verification closes the loop. For Portage, our verify Portage driver launches an isolated instance, exercises behavior, and saves evidence. A successful connection is different from a successful tool call. A successful tool call is different from a correct answer. Reports should distinguish passed, failed, blocked, and review required. A green build alone cannot prove the complete user journey."
+  },
+  {
+    "id": "pause", "chapter": "09 / AUTONOMY WITH BOUNDARIES", "title": "Move on reversible work.\nRespect the stop signs.",
+    "subtitle": "The file’s “Always pause” section names consequential actions", "kind": "boundaries",
+    "cards": [{"label":"PROCEED WITHIN SCOPE","title":"Investigate · prototype · verify","body":"Avoid unnecessary permission loops on authorized, reversible work."},{"label":"PAUSE AT THE BOUNDARY","title":"Deploy · delete · customer message","body":"The skill also names shared-branch force pushes as pause points."}],
+    "takeaway": "Skill instructions never expand the host’s permissions or override its safety rules.",
+    "narration": "The autonomy section encourages progress on authorized, reversible work. Its always pause section names consequential actions, including deployments, data deletion, customer messages, and force pushes to shared branches. Read these as workflow instructions within the host's actual permissions and your authorization. The skill cannot override those boundaries. Ask for an additional design checkpoint whenever you want to review a choice before implementation."
+  },
+  {
+    "id": "audit", "chapter": "10 / WATCH THE WORK", "title": "Trust the evidence.\nInspect the workflow.",
+    "subtitle": "show-me-your-work adds a decision trail for long or unattended tasks", "kind": "audit",
+    "takeaway": "A statement of compliance is not proof that the workflow was followed.",
+    "narration": "How do you know the agent followed the workflow? Inspect the skill files it read, the tasks it delegated, the commands it ran, and the artifacts it produced. For long work, show me your work adds a decision trail. These are observable records, not access to private internal reasoning. If a tool, model, or workflow step is unavailable, the agent should disclose that limitation."
+  },
+  {
+    "id": "prompt", "chapter": "11 / YOUR PART OF THE CONTRACT", "title": "Give the goal.\nDefine the finish line.",
+    "subtitle": "An illustrative request you could send for Portage", "kind": "prompt",
+    "takeaway": "You own product intent and approval boundaries. The agent owns execution and evidence.",
+    "narration": "Your part is to state the goal, the finish line, the evidence, and the real constraints. For example, let users authorize a remote MCP server, then prove an authenticated tool call succeeds. Keep credentials out of logs, and let me review the design first. You do not need to prescribe every skill in sequence. Clear intent gives the playbook room to do its job."
+  },
+  {
+    "id": "closing", "chapter": "POTETO MODE / THE TAKEAWAY", "title": "Intent → judgment\n→ evidence.",
+    "subtitle": "A reusable engineering discipline, expressed as instructions", "kind": "closing",
+    "takeaway": "Based on the installed pstack 0.15.30 skill. Original educational interpretation.",
+    "narration": "My reading of Lauren's intent is to turn strong engineering habits into reusable instructions, supported by tools that can prove outcomes. The human provides direction. The agent investigates, designs, implements, and verifies. Poteto mode supplies the playbook. The host supplies the capabilities. The evidence lets you assess the result. That is the useful idea to bring into Portage."
+  }
+]

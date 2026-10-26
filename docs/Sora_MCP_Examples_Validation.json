@@ -1,0 +1,79 @@
+[
+  {
+    "prompt": "Search the web using Parallel for the official Model Context Protocol documentation. Return just the official URL and a one-sentence description.",
+    "expected_tool": "ext_parallel_search_mcp__web_search",
+    "success": true,
+    "events": [
+      {
+        "type": "meta",
+        "conversation_id": "58bd2885a6d74e8a",
+        "skill": {
+          "key": "general",
+          "label": "Sora"
+        }
+      },
+      {
+        "type": "tool_call",
+        "name": "ext_parallel_search_mcp__web_search",
+        "args": {
+          "session_id": "current Portage conversation identifier",
+          "model_name": "Model Context Protocol",
+          "objective": "official documentation",
+          "search_queries": [
+            "official Model Context Protocol documentation"
+          ]
+        }
+      },
+      {
+        "type": "tool_result",
+        "name": "ext_parallel_search_mcp__web_search",
+        "ok": true,
+        "summary": "{\n  \"search_id\": \"search_130d00ef63b49a53c35673b5ba0918bf\",\n  \"results\": [\n    {\n      \"url\": \"https://modelcontextprotocol.io/docs\",\n      \"title\": \"https://modelcontextprotocol.io/docs\",\n      \"publish_date\": null,\n      \"excerpts\": [\n        \"Documentation Index\\nFetch the complete documentation "
+      },
+      {
+        "type": "done",
+        "conversation_id": "58bd2885a6d74e8a"
+      }
+    ],
+    "answer": "The official Model Context Protocol documentation can be found at https://modelcontextprotocol.io/docs. The Model Context Protocol (MCP) is an open-source standard for connecting AI applications to external systems, enabling them to access key information and perform tasks."
+  },
+  {
+    "prompt": "Use Parallel Web Fetch (web_fetch) to fetch https://modelcontextprotocol.org/docs/getting-started/intro . Summarize the page in two sentences based on the fetched content.",
+    "expected_tool": "ext_parallel_search_mcp__web_fetch",
+    "success": true,
+    "events": [
+      {
+        "type": "meta",
+        "conversation_id": "408f2791ea2a446d",
+        "skill": {
+          "key": "general",
+          "label": "Sora"
+        }
+      },
+      {
+        "type": "tool_call",
+        "name": "ext_parallel_search_mcp__web_fetch",
+        "args": {
+          "full_content": "false",
+          "model_name": "modelcontextprotocol",
+          "objective": "summarize the page",
+          "search_queries": "[]",
+          "session_id": "current Portage conversation identifier",
+          "urls": "['https://modelcontextprotocol.org/docs/getting-started/intro']",
+          "allow_live_fetch": "true"
+        }
+      },
+      {
+        "type": "tool_result",
+        "name": "ext_parallel_search_mcp__web_fetch",
+        "ok": true,
+        "summary": "{\n  \"extract_id\": \"extract_ea9d28dd9d322b5fd8ea9b02e233444a\",\n  \"results\": [\n    {\n      \"url\": \"https://modelcontextprotocol.org/docs/getting-started/intro\",\n      \"title\": \"What is the Model Context Protocol (MCP)? - Model Context Protocol\",\n      \"publish_date\": null,\n      \"excerpts\": [\n        "
+      },
+      {
+        "type": "done",
+        "conversation_id": "408f2791ea2a446d"
+      }
+    ],
+    "answer": "The Model Context Protocol (MCP) is an open-source standard for connecting AI applications to external systems, enabling them to access key information and perform tasks. It allows AI applications to connect to data sources, tools, and workflows, making it a \"USB-C port\" for AI applications."
+  }
+]

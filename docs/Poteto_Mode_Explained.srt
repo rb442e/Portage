@@ -1,0 +1,315 @@
+1
+00:00:00,161 --> 00:00:04,944
+Imagine giving an engineer a short request, and also
+handing them your team's engineering
+
+2
+00:00:04,944 --> 00:00:09,726
+handbook. That is a useful way to understand poteto
+mode. In this film, we
+
+3
+00:00:09,726 --> 00:00:14,508
+will unpack Lauren Tan's skill file, then follow an
+illustrated Portage feature from a
+
+4
+00:00:14,508 --> 00:00:16,899
+user's intention to evidence that it works.
+
+5
+00:00:19,006 --> 00:00:24,222
+The file describes Lauren's preferred engineering
+style. Read the system before changing it. Choose
+
+6
+00:00:24,222 --> 00:00:29,438
+clear structures. Keep the code and explanation
+simple. Delegate deliberately, and verify the
+outcome.
+
+7
+00:00:29,438 --> 00:00:34,653
+My interpretation is that she wants these habits to
+become repeatable, so an agent
+
+8
+00:00:34,653 --> 00:00:39,869
+can carry more of the engineering work while leaving
+evidence that a person can
+
+9
+00:00:39,869 --> 00:00:40,242
+review.
+
+10
+00:00:41,906 --> 00:00:47,468
+Open skill dot M D and you will find several layers.
+Metadata identifies the
+
+11
+00:00:47,468 --> 00:00:53,031
+skill. Triggers connect situations to other skills.
+Principles guide decisions. Playbooks organize
+different tasks,
+
+12
+00:00:53,031 --> 00:00:58,593
+such as features, bug fixes, and investigations.
+This is instruction text read by an
+
+13
+00:00:58,593 --> 00:01:04,156
+agent. It is not an executable engine that
+automatically forces every step to happen.
+
+14
+00:01:05,842 --> 00:01:10,782
+Suppose you ask, use poteto mode to add OAuth for
+remote MCP servers in
+
+15
+00:01:10,782 --> 00:01:15,722
+Portage. The agent recognizes a feature request and
+reads the feature playbook. A broken
+
+16
+00:01:15,722 --> 00:01:20,661
+connection would instead call for a bug fix. A
+question about how authentication works
+
+17
+00:01:20,661 --> 00:01:25,601
+would call for an investigation. The mode
+coordinates the relevant workflow. It does not
+
+18
+00:01:25,601 --> 00:01:27,718
+run every skill for every request.
+
+19
+00:01:29,341 --> 00:01:34,749
+The how skill traces what the system actually does.
+For Portage, that means following
+
+20
+00:01:34,749 --> 00:01:40,158
+settings, credential storage, MCP connections, and
+Sora tool calls. The why skill asks what
+
+21
+00:01:40,158 --> 00:01:45,566
+led to that design, using history and available
+records. Why becomes especially relevant when
+
+22
+00:01:45,566 --> 00:01:50,975
+ownership or layering changes. If the evidence is
+missing, the agent should say so
+
+23
+00:01:50,975 --> 00:01:53,293
+rather than inventing the original intention.
+
+24
+00:01:54,929 --> 00:02:00,824
+Next comes architecture. The architect skill uses
+arena to explore different designs and synthesize
+
+25
+00:02:00,824 --> 00:02:06,718
+a choice. For OAuth, an illustrative comparison is
+SDK managed authentication versus application
+managed
+
+26
+00:02:06,718 --> 00:02:12,613
+authentication. The agent should investigate actual
+support before choosing. The feature workflow then
+breaks
+
+27
+00:02:12,613 --> 00:02:18,508
+delivery into verifiable units. A separate plan is
+not a universal skill. If you
+
+28
+00:02:18,508 --> 00:02:22,718
+want to approve the design first, explicitly request
+that checkpoint.
+
+29
+00:02:24,357 --> 00:02:29,909
+One of the file's recurring ideas is to model the
+domain before filling in
+
+30
+00:02:29,909 --> 00:02:35,460
+logic. In an OAuth example, disconnected,
+authorizing, connected, refreshing, and reconnect
+required are meaningful
+
+31
+00:02:35,460 --> 00:02:41,011
+states. Making those transitions explicit can be
+clearer than scattering unrelated flags across the
+
+32
+00:02:41,011 --> 00:02:46,562
+code. This diagram illustrates the principle. It
+does not claim that OAuth has already
+
+33
+00:02:46,562 --> 00:02:48,148
+been implemented in Portage.
+
+34
+00:02:49,796 --> 00:02:55,109
+Poteto mode asks the lead agent to delegate focused
+work, then own the result.
+
+35
+00:02:55,109 --> 00:03:00,422
+Investigators can inspect different areas. An
+implementation agent can work within a defined
+scope.
+
+36
+00:03:00,422 --> 00:03:05,735
+A reviewer can challenge the result. Independent
+work may run in parallel, but shared
+
+37
+00:03:05,735 --> 00:03:11,047
+changes need coordination. The exact agent types and
+model choices depend on the host.
+
+38
+00:03:11,047 --> 00:03:15,222
+Installing the skill cannot create capabilities that
+Codex does not expose.
+
+39
+00:03:16,844 --> 00:03:22,624
+Verification closes the loop. For Portage, our
+verify Portage driver launches an isolated instance,
+
+40
+00:03:22,624 --> 00:03:28,403
+exercises behavior, and saves evidence. A successful
+connection is different from a successful tool
+
+41
+00:03:28,403 --> 00:03:34,183
+call. A successful tool call is different from a
+correct answer. Reports should distinguish
+
+42
+00:03:34,183 --> 00:03:39,963
+passed, failed, blocked, and review required. A
+green build alone cannot prove the complete
+
+43
+00:03:39,963 --> 00:03:40,788
+user journey.
+
+44
+00:03:42,456 --> 00:03:48,469
+The autonomy section encourages progress on
+authorized, reversible work. Its always pause
+section names
+
+45
+00:03:48,469 --> 00:03:54,483
+consequential actions, including deployments, data
+deletion, customer messages, and force pushes to
+shared branches.
+
+46
+00:03:54,483 --> 00:04:00,497
+Read these as workflow instructions within the
+host's actual permissions and your authorization.
+The
+
+47
+00:04:00,497 --> 00:04:06,510
+skill cannot override those boundaries. Ask for an
+additional design checkpoint whenever you want
+
+48
+00:04:06,510 --> 00:04:09,087
+to review a choice before implementation.
+
+49
+00:04:10,743 --> 00:04:15,685
+How do you know the agent followed the workflow?
+Inspect the skill files it
+
+50
+00:04:15,685 --> 00:04:20,626
+read, the tasks it delegated, the commands it ran,
+and the artifacts it produced.
+
+51
+00:04:20,626 --> 00:04:25,568
+For long work, show me your work adds a decision
+trail. These are observable
+
+52
+00:04:25,568 --> 00:04:30,509
+records, not access to private internal reasoning.
+If a tool, model, or workflow step
+
+53
+00:04:30,509 --> 00:04:33,333
+is unavailable, the agent should disclose that
+limitation.
+
+54
+00:04:34,944 --> 00:04:39,707
+Your part is to state the goal, the finish line, the
+evidence, and the
+
+55
+00:04:39,707 --> 00:04:44,470
+real constraints. For example, let users authorize a
+remote MCP server, then prove an
+
+56
+00:04:44,470 --> 00:04:49,233
+authenticated tool call succeeds. Keep credentials
+out of logs, and let me review the
+
+57
+00:04:49,233 --> 00:04:53,996
+design first. You do not need to prescribe every
+skill in sequence. Clear intent
+
+58
+00:04:53,996 --> 00:04:56,717
+gives the playbook room to do its job.
+
+59
+00:04:58,382 --> 00:05:04,063
+My reading of Lauren's intent is to turn strong
+engineering habits into reusable instructions,
+
+60
+00:05:04,063 --> 00:05:09,745
+supported by tools that can prove outcomes. The
+human provides direction. The agent investigates,
+
+61
+00:05:09,745 --> 00:05:15,426
+designs, implements, and verifies. Poteto mode
+supplies the playbook. The host supplies the
+capabilities.
+
+62
+00:05:15,426 --> 00:05:21,108
+The evidence lets you assess the result. That is the
+useful idea to bring
+
+63
+00:05:21,108 --> 00:05:21,919
+into Portage.

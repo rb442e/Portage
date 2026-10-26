@@ -1,0 +1,89 @@
+1
+00:00:01,033 --> 00:00:06,265
+Here are two real examples of Sora using Parallel
+MCP tools. Web Search finds information
+
+2
+00:00:06,265 --> 00:00:11,498
+across the internet. Web Fetch reads the content at
+a specific URL. We will verify
+
+3
+00:00:11,498 --> 00:00:13,591
+the tool used for each request.
+
+4
+00:00:15,387 --> 00:00:20,541
+In MCP settings, Parallel must be connected and
+available to Sora. Web Search and Web
+
+5
+00:00:20,541 --> 00:00:25,696
+Fetch must both be enabled. Each switch controls one
+tool, and changes take effect on
+
+6
+00:00:25,696 --> 00:00:26,727
+the next message.
+
+7
+00:00:27,793 --> 00:00:33,391
+First, ask Sora to search the web for the official
+Model Context Protocol documentation. This
+
+8
+00:00:33,391 --> 00:00:38,989
+request supplies a topic. Parallel Web Search finds
+relevant pages and returns results that Sora
+
+9
+00:00:38,989 --> 00:00:40,855
+can use in its answer.
+
+10
+00:00:57,302 --> 00:01:02,929
+The completed activity names Parallel search MCP and
+Web Search. This confirms that Sora called
+
+11
+00:01:02,929 --> 00:01:08,181
+the external search tool. The answer provides the
+official website and a short explanation.
+
+12
+00:01:09,968 --> 00:01:15,240
+Next, start a new conversation and give Sora a
+specific page URL. Ask it to
+
+13
+00:01:15,240 --> 00:01:20,512
+use Parallel Web Fetch and summarize the retrieved
+content. This request reads the selected page
+
+14
+00:01:20,512 --> 00:01:22,270
+rather than searching for pages.
+
+15
+00:01:24,178 --> 00:01:29,292
+The completed activity now names Web Fetch. Sora has
+retrieved the page through Parallel and
+
+16
+00:01:29,292 --> 00:01:34,407
+used the returned content to write its summary. Both
+examples were executed live through Portage.
+
+17
+00:01:35,430 --> 00:01:40,533
+Use Web Search when you have a question or topic.
+Use Web Fetch when you
+
+18
+00:01:40,533 --> 00:01:45,635
+already have a URL. In both cases, check the
+completed tool activity, and control access
+
+19
+00:01:45,635 --> 00:01:48,356
+using the individual tool switches in MCP settings.

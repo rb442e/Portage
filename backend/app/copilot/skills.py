@@ -1,9 +1,24 @@
-"""Skills: focused personas with their own instructions and tool subsets."""
+"""Load Sora's focused skills from versioned Markdown files.
+
+Each skill lives in ``skills/<key>/SKILL.md``. YAML front matter contains routing
+metadata and the Markdown body becomes the instruction block sent to Sora.
+"""
 from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
+import yaml
+
+
+SKILLS_DIR = Path(__file__).with_name("skills")
+SKILL_ORDER = ("mapping", "catalog", "migration", "guide", "lineage", "general")
+
+
+class SkillError(RuntimeError):
+    """A skill file is malformed or the installed skill set is incomplete."""
 
 
 @dataclass(frozen=True)
@@ -18,95 +33,89 @@ class Skill:
     suggestions: Tuple[str, ...] = ()
 
 
-SKILLS: Dict[str, Skill] = {s.key: s for s in [
-    Skill("mapping", "Mapping Architect", "Edit field mappings and save new versions.",
-          "You specialise in Rally-to-Jira field mappings. Mapping edits are saved as a NEW version "
-          "(jira_<artifact>_mapping_vN); the old version is never overwritten. When the user asks for a change, call "
-          "propose_mapping_edit right away instead of describing what you would do: it validates field names itself and "
-          "tells you the valid ones if something is wrong. Use get_mapping or list_mapping_fields only when you truly need "
-          "to look something up, and after looking, still call propose_mapping_edit. "
-          "If the user names no base version, use the latest saved mapping for that artifact (list_mappings). "
-          "If the user gives a name for the new version (for example 'save as jira_us_mapping_v5' or 'call it v5'), "
-          "pass it unchanged as version_name; otherwise leave version_name out.",
-          ("list_mappings", "get_mapping", "compare_mappings", "list_mapping_fields", "propose_mapping_edit",
-           "list_sources", "describe_source", "search_docs"),
-          ("mapping", "map ", "field", "transform", "fallback", "story point", "artifact", "version of the mapping", "coalesce"),
-          ("/mapping",),
-          ("Show the latest User Story mapping", "Map Rally Iteration to the Jira sprint field for User Story",
-           "What changed between my last two mapping versions?")),
-    Skill("catalog", "Catalog Curator", "Maintain sprint, version, user and team catalogs.",
-          "You specialise in the Jira Catalog (sprint, version, user, team). Source = Rally value, target = Jira value. "
-            "When asked to add or change values, call propose_catalog_upsert immediately; do not describe a function call, "
-            "print JSON, or narrate what you plan to call. One entry has exactly 'source' and 'target'; 'note' belongs "
-            "at the top level, not inside entries. For a user catalog, source is the exact user name and target is the "
-            "exact Jira email or accountId. If a spreadsheet or screenshot is attached, read its headers and preserve "
-            "each row and cell exactly: one row becomes one entry. Never concatenate adjacent cells, complete an email, "
-              "or infer unreadable text. If an email is redacted as <email_N>, use that placeholder exactly; the server "
-              "restores the real email in the proposal, so do not ask the user to repeat it. If vision marks a cell [unclear] "
-              "or a value is genuinely missing, ask one short clarification before proposing. "
-            "To undo call list_catalog_versions then propose_catalog_restore. To find sprint, version, user or team "
-            "values in an uploaded Rally CSV that are missing from the catalog, call find_unmapped_values with just the "
-            "kind (no column) and list the missing values it returns with their counts.",
-          ("list_catalogs", "get_catalog_entries", "list_catalog_versions", "find_unmapped_values", "distinct_values",
-           "list_sources", "describe_source", "propose_catalog_upsert", "propose_catalog_remove",
-           "propose_catalog_restore", "search_docs"),
-          ("catalog", "sprint", "fix version", "unmapped", "team", "user catalog", "lookup", "account id", "undo"),
-          ("/lookups",),
-          ("Which sprints in my latest upload are missing from the catalog?", "Add Sprint 24 with Jira ID 1042 to the sprint catalog",
-           "Undo the last change to the team catalog")),
-    Skill("migration", "Migration Operator", "Inspect jobs, failures and readiness.",
-          "You specialise in migration runs. Use get_job (no arguments for the most recent run, or an id from list_jobs) "
-          "to explain results and failures: lead with how many items failed and the failure_causes, then say what to do. "
-          "Use find_unmapped_values to name the missing catalog values. You cannot start a migration; tell the user to "
-          "use the Migrate page.",
-          ("list_jobs", "get_job", "list_sources", "describe_source", "find_unmapped_values", "list_mappings",
-           "connection_status", "search_docs"),
-          ("job", "migrat", "failed", "error", "dry run", "dry-run", "preview", "export", "attachment", "why did"),
-          ("/migrate", "/reports", "/exports", "/attachments", "/"),
-          ("Why did my last migration fail?", "Summarise my recent jobs", "Is my Jira connection configured?")),
-    Skill("guide", "Guide", "Explain how Portage works.",
-          "You explain how Portage works. Call search_docs and base your answer on what it returns.",
-          ("search_docs", "connection_status", "list_mappings", "list_catalogs"),
-          ("how do", "how to", "what is", "explain", "help", "where"),
-          ("/connections",),
-          ("How do mapping versions work?", "What does a catalog do during migration?")),
-    Skill("lineage", "Lineage Analyst", "Trace how fields, mappings, catalogs, uploads and jobs relate.",
-          "You trace relationships across Portage using the knowledge graph. Call graph_search with the entities in the "
-          "question (field, mapping, catalog or job names) for specific questions, and graph_overview for broad ones. "
-          "Answer only from the returned 'facts' and relationships, in at most four short bullets, naming the mapping "
-          "versions. Rally fields are only the sources of 'feeds' relationships; catalogs translate values and are never "
-          "Rally fields. Do not explain how the graph works.",
-          ("graph_search", "graph_overview", "list_mappings", "get_mapping", "compare_mappings", "search_docs"),
-          ("lineage", "impact", "trace", "depends on", "dependen", "relationship", "graph", "connected to",
-           "used by", "which mappings", "what feeds", "what uses"),
-          (),
-          ("Which Rally fields feed the Jira sprint field for User Story?", "What is the state of my workspace?",
-           "Which catalogs and fields are affected by the failures in my last job?")),
-    Skill("general", "Sora", "General assistant.",
-          "You can use any tool. Pick the simplest tool that answers the question.", None),
-]}
+def _strings(value: Any, field: str, path: Path) -> Tuple[str, ...]:
+    if value is None:
+        return ()
+    if not isinstance(value, list) or not all(isinstance(item, str) and item.strip() for item in value):
+        raise SkillError(f"{path}: '{field}' must be a list of non-empty strings")
+    return tuple(item.strip() for item in value)
+
+
+def _read(path: Path) -> Skill:
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as e:
+        raise SkillError(f"Could not read {path}: {e}") from e
+    match = re.fullmatch(r"---\s*\n(.*?)\n---\s*\n(.*\S)\s*", text, re.DOTALL)
+    if not match:
+        raise SkillError(f"{path}: begin with YAML front matter delimited by --- and include Markdown instructions")
+    try:
+        meta = yaml.safe_load(match.group(1))
+    except yaml.YAMLError as e:
+        raise SkillError(f"{path}: invalid YAML front matter: {e}") from e
+    if not isinstance(meta, dict):
+        raise SkillError(f"{path}: front matter must be a mapping")
+
+    key, label, summary = meta.get("key"), meta.get("label"), meta.get("summary")
+    if not isinstance(key, str) or not re.fullmatch(r"[a-z][a-z0-9_-]*", key):
+        raise SkillError(f"{path}: 'key' must be a lowercase identifier")
+    if path.parent.name != key:
+        raise SkillError(f"{path}: directory name must match skill key '{key}'")
+    if not isinstance(label, str) or not label.strip() or not isinstance(summary, str) or not summary.strip():
+        raise SkillError(f"{path}: 'label' and 'summary' must be non-empty strings")
+    raw_tools = meta.get("tools")
+    if raw_tools is None or raw_tools == "all":
+        tools: Optional[Tuple[str, ...]] = None
+    elif isinstance(raw_tools, list):
+        tools = _strings(raw_tools, "tools", path)
+    else:
+        raise SkillError(f"{path}: 'tools' must be a list or 'all'")
+    return Skill(key=key, label=label.strip(), summary=summary.strip(), instructions=match.group(2).strip(),
+                 tools=tools, keywords=_strings(meta.get("keywords"), "keywords", path),
+                 routes=_strings(meta.get("routes"), "routes", path),
+                 suggestions=_strings(meta.get("suggestions"), "suggestions", path))
+
+
+def load_skills(directory: Path = SKILLS_DIR) -> Dict[str, Skill]:
+    """Load the complete, ordered Sora skill set and fail fast on bad configuration."""
+    loaded: Dict[str, Skill] = {}
+    for key in SKILL_ORDER:
+        path = directory / key / "SKILL.md"
+        if not path.is_file():
+            raise SkillError(f"Missing required skill file: {path}")
+        skill = _read(path)
+        if skill.key in loaded:
+            raise SkillError(f"Duplicate skill key '{skill.key}'")
+        loaded[skill.key] = skill
+    unexpected = sorted(path.parent.name for path in directory.glob("*/SKILL.md") if path.parent.name not in loaded)
+    if unexpected:
+        raise SkillError(f"Unknown skills not listed in SKILL_ORDER: {', '.join(unexpected)}")
+    return loaded
+
+
+SKILLS = load_skills()
 
 
 def pick_skill(message: str, route: str, explicit: str = "") -> Skill:
-    m = re.match(r"\s*@(\w+)", message or "")
-    key = (explicit or (m.group(1).lower() if m else "")).lower()
+    match = re.match(r"\s*@(\w+)", message or "")
+    key = (explicit or (match.group(1).lower() if match else "")).lower()
     if key in SKILLS:
         return SKILLS[key]
     text = (message or "").lower()
     best, best_score = SKILLS["general"], 0
-    for s in SKILLS.values():
-        if s.key == "general":
+    for skill in SKILLS.values():
+        if skill.key == "general":
             continue
-        score = sum(2 for k in s.keywords if k in text)
-        if route in s.routes and route != "/":
+        score = sum(2 for keyword in skill.keywords if keyword in text)
+        if route in skill.routes and route != "/":
             score += 1
         if score > best_score:
-            best, best_score = s, score
+            best, best_score = skill, score
     return best
 
 
 def suggestions_for(route: str) -> List[str]:
-    for s in SKILLS.values():
-        if route in s.routes and route != "/":
-            return list(s.suggestions)
+    for skill in SKILLS.values():
+        if route in skill.routes and route != "/":
+            return list(skill.suggestions)
     return list(SKILLS["migration"].suggestions) + list(SKILLS["guide"].suggestions[:1])

@@ -8,11 +8,29 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.staticfiles import StaticFiles
 
 from . import __version__, auth, store
 from .config import settings
 from .routers import (attachments, auth as auth_router, connections, copilot, lookups, mappings,
                       migrations, settings as settings_router, sources, tools)
+
+
+class FrontendFiles(StaticFiles):
+    """Serve client-side navigation routes without masking missing APIs or assets."""
+
+    async def get_response(self, path, scope):
+        try:
+            return await super().get_response(path, scope)
+        except StarletteHTTPException as exc:
+            headers = dict(scope.get("headers", []))
+            navigation = b"text/html" in headers.get(b"accept", b"")
+            reserved = path == "api" or path.startswith(("api/", "assets/"))
+            if exc.status_code != 404 or not navigation or reserved or Path(path).suffix:
+                raise
+            return await super().get_response("index.html", scope)
+
 
 app = FastAPI(title="Portage", version=__version__,
               description="Carry your work across, intact — ALM migration platform.")
@@ -58,6 +76,4 @@ def health() -> dict:
 if settings.frontend_dist:
     dist = Path(settings.frontend_dist)
     if dist.exists():
-        from fastapi.staticfiles import StaticFiles
-
-        app.mount("/", StaticFiles(directory=str(dist), html=True), name="frontend")
+        app.mount("/", FrontendFiles(directory=str(dist), html=True), name="frontend")
